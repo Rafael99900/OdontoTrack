@@ -30,8 +30,8 @@ export default async function RevisoesPage() {
           <dt>Vagas confirmadas</dt><dd>{notice.position.vacancies} gerais · {notice.position.vacanciesPcd} PCD</dd>
           <dt>Inscrições</dt><dd>{notice.facts.registrationPeriod}</dd>
           <dt>Banca</dt><dd>{notice.facts.organizer}</dd>
-          <dt>Data da prova</dt><dd className="pending-value">A confirmar no PDF oficial</dd>
-          <dt>Conteúdo programático</dt><dd className="pending-value">A extrair do PDF oficial</dd>
+          <dt>Data da prova</dt><dd>{notice.facts.examDate}</dd>
+          <dt>Conteúdo programático</dt><dd>{notice.facts.syllabus}</dd>
         </dl>
         <div className="editorial-actions">
           <a className="primario" href={notice.sourceUrl} target="_blank" rel="noreferrer" data-cy="editorial-open-official-source">Abrir fonte oficial</a>
@@ -51,7 +51,7 @@ export default async function RevisoesPage() {
           <span className="tag">PRÓXIMA REVISÃO</span>
           <h2>Checklist de aprovação</h2>
           <ol>{notice.reviewChecklist.map((item) => <li key={item}>{item}</li>)}</ol>
-          <p className="review-note">A aprovação será habilitada somente após o PDF ser arquivado e os fatos receberem evidência por página.</p>
+          <p className="review-note">A aprovação será habilitada somente após o PDF ser arquivado em storage privado e os fatos receberem evidência por página.</p>
         </article>
       </section>
     </main>
