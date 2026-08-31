@@ -2,9 +2,16 @@ import { redirect } from "next/navigation";
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
+export const dynamic = "force-dynamic";
+
 export default async function AreaPage() {
   const client = await createSupabaseServerClient();
   const { data: { user } } = await client.auth.getUser();
   if (!user) redirect("/login");
-  return <main data-cy="auth-protected-area"><h1>Área do aluno</h1><p>Acesso autenticado para {user.email}.</p></main>;
+  return <main className="area-page" data-cy="auth-protected-area">
+    <span className="tag">ÁREA PRIVADA</span>
+    <h1>Olá, {user.email}.</h1>
+    <p>Revise fontes oficiais antes de transformar um edital em curso e trilha de estudo.</p>
+    <a className="primario" href="/area/revisoes" data-cy="open-editorial-review">Abrir revisão editorial</a>
+  </main>;
 }

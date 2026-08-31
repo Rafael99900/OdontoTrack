@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/coletar-fontes",
+      "schedule": "0 11 * * *"
+    }
+  ]
+}
