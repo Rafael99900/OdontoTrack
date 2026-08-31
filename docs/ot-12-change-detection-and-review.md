@@ -14,6 +14,8 @@ O extrator só chama o fluxo OT-12 quando dispõe de:
 - fatos normalizados por chave, cargo quando aplicável e evidência com página/trecho; valores de data em ISO 8601, dinheiro em centavos e números sem formatação;
 - nível de confiança da extração. OCR incompleto, ausência de página ou fato crítico sem evidência impede classificação automática como retificação.
 
+O [portão de confiança de fontes reais](ot-12-trusted-source-gate.md) é obrigatório antes desta entrada: snapshot de origem não oficial, inativa, incompleta ou de fixture é rejeitada sem criar entidade candidata.
+
 Antes de gravar, o worker confirma que o snapshot pertence à mesma `source_id` do aviso e que o hash da versão candidata corresponde ao hash auditado do documento. A migration adiciona `origin_snapshot_id` apenas como ligação rastreável; essa compatibilidade fonte-aviso é uma validação obrigatória do serviço.
 
 ## Algoritmo idempotente
