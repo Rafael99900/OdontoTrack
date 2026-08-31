@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "validate:ot-10": "node scripts/validate-ot-10.mjs"
+    "validate:ot-10": "node scripts/validate-ot-10.mjs",
+    "collect:pmsp": "node scripts/collect-pmsp.mjs",
+    "test:collector-pmsp": "node scripts/test-pmsp-collector.mjs"
   },
   "dependencies": {
     "next": "16.3.3",
