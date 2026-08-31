@@ -19,6 +19,7 @@
     "test:official-document-archive": "node scripts/test-official-document-archive.mjs",
     "test:archive-pmsp-document": "node scripts/test-archive-pmsp-document.mjs",
     "test:collector-maua": "node scripts/test-maua-collector.mjs",
+    "test:collector-grande-abc": "node scripts/test-grande-abc-collector.mjs",
     "test:editorial-review-queue": "node scripts/test-editorial-review-queue.mjs",
     "test:auth-contract": "node scripts/test-auth-contract.mjs"
   },
