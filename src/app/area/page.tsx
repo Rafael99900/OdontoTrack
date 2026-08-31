@@ -12,6 +12,9 @@ export default async function AreaPage() {
     <span className="tag">ÁREA PRIVADA</span>
     <h1>Olá, {user.email}.</h1>
     <p>Revise fontes oficiais antes de transformar um edital em curso e trilha de estudo.</p>
-    <a className="primario" href="/area/revisoes" data-cy="open-editorial-review">Abrir revisão editorial</a>
+    <div className="area-actions">
+      <a className="primario" href="/area/revisoes" data-cy="open-editorial-review">Abrir revisão editorial</a>
+      <a className="secundario" href="/area/cursos" data-cy="open-course-draft">Ver trilha em rascunho</a>
+    </div>
   </main>;
 }

@@ -1,0 +1,31 @@
+import { redirect } from "next/navigation";
+
+import { createNoticeCourseDraft } from "@/lib/courses/notice-course-draft";
+import { firstRealNoticeCandidate } from "@/lib/notices/first-real-notice";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+
+export const dynamic = "force-dynamic";
+
+export default async function CursosPage() {
+  const client = await createSupabaseServerClient();
+  const { data: { user } } = await client.auth.getUser();
+  if (!user) redirect("/login");
+  const course = createNoticeCourseDraft(firstRealNoticeCandidate);
+  const lessonCount = course.modules.reduce((total, module) => total + module.lessons.length, 0);
+
+  return <main className="editorial-page" data-cy="courses-editorial-page">
+    <header className="editorial-header">
+      <div><span className="tag">CURSO GERADO A PARTIR DO EDITAL</span><h1>{course.title}</h1><p>{lessonCount} aulas planejadas a partir do conteúdo da página 31 do edital oficial.</p></div>
+      <a className="secundario" href="/area" data-cy="courses-back-dashboard">Voltar à área</a>
+    </header>
+    <section className="course-guard" data-cy="course-editorial-guard">
+      <strong>{course.canPublish ? "Pronto para produção" : "Aguardando aprovação editorial"}</strong>
+      <p>{course.canPublish ? "Os materiais podem seguir para produção editorial." : "A trilha está estruturada, mas não será publicada nem exibirá conteúdo gerado enquanto o edital não for aprovado."}</p>
+      <a href={course.sourceDocumentUrl} target="_blank" rel="noreferrer" data-cy="course-open-source-page">Consultar evidência oficial</a>
+    </section>
+    <section className="course-modules" data-cy="course-draft-modules">
+      {course.modules.map((module) => <article key={module.id}><span className="tag">MÓDULO</span><h2>{module.title}</h2>{module.lessons.map((lesson) => <div className="course-lesson" key={lesson.id}><div><b>{lesson.title}</b><p>{lesson.objective}</p></div><small>Fonte: pág. {lesson.evidencePage}</small></div>)}</article>)}
+    </section>
+    <section className="editorial-grid" data-cy="course-production-rules"><article><span className="tag">PADRÃO DE PRODUÇÃO</span><h2>Vídeo, PDF, áudio e questões</h2><ol>{course.productionRules.map((rule) => <li key={rule}>{rule}</li>)}</ol></article></section>
+  </main>;
+}
