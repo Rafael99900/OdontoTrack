@@ -2,6 +2,14 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+## Configuração segura
+
+Antes de iniciar, copie `.env.example` para `.env.local` e preencha apenas as chaves necessárias. Não versione `.env.local` nem cole credenciais em arquivos, logs ou documentação.
+
+O protótipo pode abrir sem Supabase. A rota de IA exige `GEMINI_API_KEY`; se ela estiver ausente, responde HTTP 503 sem expor informação sensível.
+
+Consulte o [contrato de ambientes e segredos](docs/environment-configuration.md) para os ambientes Local, Preview e Produção, as variáveis reservadas do Supabase e os comandos de verificação.
+
 First, run the development server:
 
 ```bash

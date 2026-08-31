@@ -21,5 +21,6 @@
 ## Segurança
 
 - Chaves somente em variáveis de ambiente da Vercel/Supabase.
+- O contrato de variáveis, os ambientes e o comportamento seguro para configuração ausente estão em [Configuração de ambientes](environment-configuration.md).
 - Row Level Security: cada aluno vê apenas conta, progresso e anotações próprios.
 - PDFs oficiais preservam URL e versão; dados pessoais de listas de classificados não são indexados.
