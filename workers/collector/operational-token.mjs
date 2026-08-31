@@ -14,7 +14,7 @@ export class OperationalTokenUnauthorizedError extends Error {
   }
 }
 
-export function requireOperationalToken(authorization, configuredToken = process.env.OPERATIONS_COLLECTOR_TOKEN) {
+export function requireToken(authorization, configuredToken) {
   if (!configuredToken) throw new OperationalTokenConfigurationError();
   const suppliedToken = authorization?.startsWith("Bearer ") ? authorization.slice("Bearer ".length) : "";
   const expected = Buffer.from(configuredToken);
@@ -22,4 +22,12 @@ export function requireOperationalToken(authorization, configuredToken = process
   if (expected.length !== supplied.length || !timingSafeEqual(expected, supplied)) {
     throw new OperationalTokenUnauthorizedError();
   }
+}
+
+export function requireOperationalToken(authorization, configuredToken = process.env.OPERATIONS_COLLECTOR_TOKEN) {
+  requireToken(authorization, configuredToken);
+}
+
+export function requireEditorialReviewToken(authorization, configuredToken = process.env.EDITORIAL_REVIEW_TOKEN) {
+  requireToken(authorization, configuredToken);
 }

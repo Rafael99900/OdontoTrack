@@ -10,6 +10,19 @@ export function createSupabaseRestClient({ url = process.env.SUPABASE_URL, servi
   const baseUrl = new URL("rest/v1/", url.endsWith("/") ? url : `${url}/`);
 
   return {
+    async list(table, { filters = {}, select = "*", order, limit } = {}) {
+      const endpoint = new URL(table, baseUrl);
+      endpoint.searchParams.set("select", select);
+      if (order) endpoint.searchParams.set("order", order);
+      if (limit) endpoint.searchParams.set("limit", String(limit));
+      for (const [key, value] of Object.entries(filters)) endpoint.searchParams.set(key, value);
+      const response = await fetchImplementation(endpoint, {
+        headers: { apikey: serviceRoleKey, Authorization: `Bearer ${serviceRoleKey}` },
+        cache: "no-store",
+      });
+      if (!response.ok) throw new Error(`Supabase não aceitou consulta em ${table} (${response.status}).`);
+      return response.json();
+    },
     async findOne(table, filters, { select = "id" } = {}) {
       const endpoint = new URL(table, baseUrl);
       endpoint.searchParams.set("select", select);
