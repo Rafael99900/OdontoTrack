@@ -6,8 +6,16 @@ Arquivos desta entrega:
 - `seed/ot_10_traceability_seed.sql`: duas versões sintéticas de um edital.
 - `tests/ot_10_traceability_verify.sql`: asserts e consultas de verificação.
 - `tests/ot_10_schema_verify.sql`: verificação somente de leitura para um ambiente já migrado.
+- `migrations/004_collection_audit_access_control.sql`: RLS e grants mínimos para os registros operacionais de OT-11.
+- `tests/ot_11_collection_access_verify.sql`: verificação somente de leitura do acesso de OT-11.
+- `migrations/005_notice_version_review_queue.sql`: vínculo de snapshot, diff de versão e fila interna de revisão de OT-12.
+- `tests/ot_12_review_queue_schema_verify.sql`: verificação de schema e acesso da fila OT-12.
 
 Antes de conectar ao Supabase existente, siga o [plano de aplicação OT-10](../docs/ot-10-supabase-application-plan.md). Ele separa a validação com dados sintéticos da aplicação segura em Produção.
+
+Para `collection_runs` e `source_snapshots`, siga também o [controle de acesso OT-11](../docs/ot-11-collection-access-control.md). A migration 004 deve ser aplicada após a 003.
+
+A migration 005 depende das migrations 002, 003 e 004. O fluxo de comparação e a classificação de retificação estão em [OT-12: comparação e revisão](../docs/ot-12-change-detection-and-review.md).
 
 ## Verificação local com PostgreSQL
 
