@@ -1,3 +1,5 @@
+import { createHash } from "node:crypto";
+
 const OFFICIAL_HOSTS = new Set([
   "clic.prefeitura.sp.gov.br",
   "www.prefeitura.sp.gov.br",
@@ -5,6 +7,18 @@ const OFFICIAL_HOSTS = new Set([
 ]);
 
 const DOCUMENT_EXTENSION = /\.(?:pdf|docx?|xlsx?)(?:$|[?#])/i;
+const MAX_PDF_BYTES = 25 * 1024 * 1024;
+
+function sha256(bytes) {
+  return createHash("sha256").update(bytes).digest("hex");
+}
+
+export class OfficialDocumentValidationError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "OfficialDocumentValidationError";
+  }
+}
 
 function decodeHtml(value) {
   return value
@@ -79,5 +93,42 @@ export async function fetchPmspNoticeDocumentCandidates({ fetchPage = fetch, sou
   return {
     sourceUrl: canonicalSourceUrl,
     candidates: discoverPmspNoticeDocuments(html, { sourceUrl: canonicalSourceUrl }),
+  };
+}
+
+/**
+ * Baixa um candidato de maneira limitada e o aceita somente se o retorno for
+ * realmente um PDF da infraestrutura oficial. A gravação no banco/Storage é
+ * propositalmente responsabilidade de uma etapa posterior e editorial.
+ */
+export async function fetchVerifiedPmspPdf({ documentUrl, fetchPage = fetch, maxBytes = MAX_PDF_BYTES } = {}) {
+  if (!documentUrl) throw new OfficialDocumentValidationError("A URL do documento é obrigatória.");
+  const requestedUrl = absoluteOfficialUrl(documentUrl, documentUrl);
+  if (!requestedUrl) throw new OfficialDocumentValidationError("O documento deve estar em HTTPS e host oficial permitido.");
+
+  const response = await fetchPage(requestedUrl, {
+    headers: { "user-agent": "OdontoTrack/0.1 official-pdf-verification" },
+    redirect: "follow",
+  });
+  if (!response.ok) throw new OfficialDocumentValidationError(`Documento oficial indisponível (HTTP ${response.status}).`);
+
+  const finalUrl = absoluteOfficialUrl(response.url || requestedUrl.toString(), requestedUrl.toString());
+  if (!finalUrl) throw new OfficialDocumentValidationError("O redirecionamento do documento saiu do host oficial permitido.");
+  const contentType = response.headers.get("content-type")?.toLowerCase() ?? "";
+  if (!contentType.includes("application/pdf")) throw new OfficialDocumentValidationError("O documento não informou content-type PDF.");
+
+  const declaredLength = Number(response.headers.get("content-length"));
+  if (Number.isFinite(declaredLength) && declaredLength > maxBytes) throw new OfficialDocumentValidationError("O PDF excede o limite de tamanho permitido.");
+  const bytes = Buffer.from(await response.arrayBuffer());
+  if (bytes.byteLength > maxBytes) throw new OfficialDocumentValidationError("O PDF excede o limite de tamanho permitido.");
+  if (bytes.subarray(0, 5).toString("ascii") !== "%PDF-") throw new OfficialDocumentValidationError("O conteúdo não possui assinatura PDF válida.");
+
+  return {
+    requestedUrl: requestedUrl.toString(),
+    canonicalUrl: finalUrl.toString(),
+    contentHash: sha256(bytes),
+    contentType,
+    byteLength: bytes.byteLength,
+    bytes,
   };
 }
