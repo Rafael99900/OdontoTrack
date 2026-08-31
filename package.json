@@ -12,7 +12,8 @@
     "test:collector-pmsp": "node scripts/test-pmsp-collector.mjs",
     "collect:pmsp:supabase": "node scripts/collect-pmsp-to-supabase.mjs",
     "test:collector-pmsp-supabase": "node scripts/test-pmsp-supabase-persistence.mjs",
-    "test:operational-token": "node scripts/test-operational-token.mjs"
+    "test:operational-token": "node scripts/test-operational-token.mjs",
+    "test:ot-12-change-review": "node scripts/test-ot-12-change-review.mjs"
   },
   "dependencies": {
     "next": "16.3.3",
