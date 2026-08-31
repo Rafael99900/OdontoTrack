@@ -5,6 +5,9 @@ Arquivos desta entrega:
 - `migrations/002_official_notice_traceability.sql`: estrutura versionada.
 - `seed/ot_10_traceability_seed.sql`: duas versões sintéticas de um edital.
 - `tests/ot_10_traceability_verify.sql`: asserts e consultas de verificação.
+- `tests/ot_10_schema_verify.sql`: verificação somente de leitura para um ambiente já migrado.
+
+Antes de conectar ao Supabase existente, siga o [plano de aplicação OT-10](../docs/ot-10-supabase-application-plan.md). Ele separa a validação com dados sintéticos da aplicação segura em Produção.
 
 ## Verificação local com PostgreSQL
 
@@ -23,9 +26,22 @@ critical_facts_have_versioned_evidence | true
 notice_versions_are_preserved          | true
 ```
 
+Sem PostgreSQL, é possível validar a estrutura e os asserts esperados sem
+rede, banco, credenciais ou variáveis de ambiente:
+
+```sh
+npm run validate:ot-10
+```
+
+Isso não substitui a execução SQL: valida que os contratos exigidos existem
+nos três arquivos da entrega.
+
 ## O que ainda depende do Supabase externo
 
 - Aplicar a migration no projeto Supabase alvo.
 - Configurar RLS e permissões para os papéis de coleta e revisão editorial.
 - Configurar Storage para os PDFs originais; esta migration armazena URL e hash, não o arquivo.
 - Integrar o coletor e o extrator para inserir snapshots, versões, fatos e evidências reais.
+- Configurar `SUPABASE_URL` e `SUPABASE_ANON_KEY` no ambiente de servidor para
+  que `GET /api/editais` consulte apenas editais publicados. Sem elas, a rota
+  responde `503` com o código `CATALOG_NOT_CONFIGURED`, sem tentar conexão.

@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "validate:ot-10": "node scripts/validate-ot-10.mjs"
   },
   "dependencies": {
     "next": "16.3.3",
