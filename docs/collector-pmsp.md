@@ -70,3 +70,17 @@ where source_key = 'sp-clic-concursos' and content_hash = '<hash-do-log>';
 O aceite é: duas linhas de `collection_runs`, uma `change_detected` e outra
 `unchanged`, e uma única linha de `source_snapshots`. Se uma variável estiver
 ausente, `collect:pmsp:supabase` deve abortar antes de rede/escrita com código 2.
+
+## Endpoint operacional protegido
+
+O endpoint `POST /api/operacoes/coletar-pmsp` existe somente para disparo
+server-side e requer a variável protegida `OPERATIONS_COLLECTOR_TOKEN`, além de
+`SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY`. Ele não aceita token por query
+string ou corpo: exige `Authorization: Bearer <token>`, compara em tempo
+constante e retorna apenas metadados sanitizados (IDs, hash, URL e status).
+
+O responsável deve configurar o token em Production e manter seu valor fora de
+chat, código, commits e logs. Até essa configuração, o endpoint responde 503 e
+não inicia coleta. Após autorização explícita de disparo, a validação usa a URL
+do deployment Vercel e dois POSTs autenticados; a resposta deve trazer dois
+`runId`, o mesmo `snapshotId` e `runStatus` `change_detected`/`unchanged`.
