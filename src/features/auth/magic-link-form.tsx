@@ -24,9 +24,12 @@ export function MagicLinkForm() {
       setStatus("sent");
       setMessage("Enviamos um link seguro para seu e-mail. Verifique também a caixa de spam.");
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message.toLowerCase() : "";
       setStatus("error");
       setMessage(error instanceof SupabaseAuthConfigurationError
         ? "O login ainda não está disponível neste ambiente."
+        : /rate limit|email.*limit|too many/i.test(errorMessage)
+          ? "O limite temporário de e-mails do Supabase foi atingido. Aguarde antes de solicitar outro link."
         : "Não foi possível enviar o link. Confira o e-mail e tente novamente.");
     }
   }
