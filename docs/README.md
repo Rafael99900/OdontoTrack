@@ -8,6 +8,7 @@
 - [Sistema editorial do PDF](pdf-editorial-system.md): estrutura, identidade e regra sem travessão.
 - [IA e fontes oficiais](ai-and-official-sources.md): provedor inicial, segurança, coleta e convenção `data-cy`.
 - [Gap analysis técnico](gap-analysis.md): comparação objetiva entre o protótipo atual e o MVP necessário.
+- [Plano de aplicação OT-10](ot-10-supabase-application-plan.md): ordem, validação e reversibilidade para a migration de rastreabilidade.
 
 - `product-requirements.md`: requisitos funcionais e não funcionais.
 - `technical-architecture.md`: arquitetura proposta com Vercel e Supabase.
