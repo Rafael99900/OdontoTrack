@@ -10,12 +10,16 @@ Arquivos desta entrega:
 - `tests/ot_11_collection_access_verify.sql`: verificação somente de leitura do acesso de OT-11.
 - `migrations/005_notice_version_review_queue.sql`: vínculo de snapshot, diff de versão e fila interna de revisão de OT-12.
 - `tests/ot_12_review_queue_schema_verify.sql`: verificação de schema e acesso da fila OT-12.
+- `migrations/006_identity_roles_rls_audit.sql`: perfis, papéis estudante/editor, RLS e auditoria mínima de OT-02/OT-03.
+- `tests/ot_02_03_identity_rls_verify.sql`: verificação estrutural das políticas de identidade.
 
 Antes de conectar ao Supabase existente, siga o [plano de aplicação OT-10](../docs/ot-10-supabase-application-plan.md). Ele separa a validação com dados sintéticos da aplicação segura em Produção.
 
 Para `collection_runs` e `source_snapshots`, siga também o [controle de acesso OT-11](../docs/ot-11-collection-access-control.md). A migration 004 deve ser aplicada após a 003.
 
 A migration 005 depende das migrations 002, 003 e 004. O fluxo de comparação e a classificação de retificação estão em [OT-12: comparação e revisão](../docs/ot-12-change-detection-and-review.md).
+
+A migration 006 depende do Supabase Auth (`auth.users`) e deve ser validada com [identidade, RLS e auditoria](../docs/ot-02-03-identity-and-rls.md) antes de Produção.
 
 ## Verificação local com PostgreSQL
 

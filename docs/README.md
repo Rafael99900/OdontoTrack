@@ -13,6 +13,7 @@
 - [OT-12: comparação e revisão](ot-12-change-detection-and-review.md): diff idempotente, retificação potencial e fila editorial.
 - [Portão de fontes OT-12](ot-12-trusted-source-gate.md): critérios para aceitar snapshots reais no classificador.
 - [Fluxo CLIC → PDF OT-12](ot-12-clic-to-pdf-pipeline.md): descoberta, extração e versionamento pendente de editais oficiais.
+- [Identidade e RLS OT-02/OT-03](ot-02-03-identity-and-rls.md): perfis, papéis, privacidade e auditoria mínima.
 
 - `product-requirements.md`: requisitos funcionais e não funcionais.
 - `technical-architecture.md`: arquitetura proposta com Vercel e Supabase.
