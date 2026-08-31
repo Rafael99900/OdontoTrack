@@ -1,4 +1,15 @@
 import { createSupabaseCollectorPersistence, SupabasePersistenceConfigurationError } from "../workers/collector/supabase-persistence.mjs";
+import { spawnSync } from "node:child_process";
+import { resolve } from "node:path";
+
+const { SUPABASE_URL: _ignoredUrl, SUPABASE_SERVICE_ROLE_KEY: _ignoredKey, ...environmentWithoutSupabase } = process.env;
+const missingConfigCommand = spawnSync(process.execPath, [resolve(import.meta.dirname, "collect-pmsp-to-supabase.mjs")], {
+  env: environmentWithoutSupabase,
+  encoding: "utf8",
+});
+if (missingConfigCommand.status !== 2 || !missingConfigCommand.stderr.includes("Persistência Supabase não configurada")) {
+  throw new Error("Comando de persistência deveria falhar com código 2 antes da coleta.");
+}
 
 const missing = createSupabaseCollectorPersistence;
 const previousUrl = process.env.SUPABASE_URL;
