@@ -10,10 +10,14 @@ export async function GET(request: Request) {
   try {
     const client = await createSupabaseServerClient();
     const { error } = await client.auth.exchangeCodeForSession(code);
-    if (error) return NextResponse.redirect(new URL("/login?error=invalid_link", url.origin));
+    if (error) {
+      console.error("Falha ao trocar o código de autenticação", { message: error.message, status: error.status });
+      return NextResponse.redirect(new URL("/login?error=invalid_link", url.origin));
+    }
     return NextResponse.redirect(new URL("/area", url.origin));
   } catch (error) {
     if (error instanceof SupabaseAuthConfigurationError) return NextResponse.redirect(new URL("/login?error=configuration", url.origin));
+    console.error("Falha inesperada no callback de autenticação", error);
     return NextResponse.redirect(new URL("/login?error=callback_failed", url.origin));
   }
 }
