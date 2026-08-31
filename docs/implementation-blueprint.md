@@ -149,13 +149,14 @@ tests/
 
 **Dados:** `pdf_templates`, `generated_pdfs`, `lesson_assets`.
 
-**Fluxo:** a aula aprovada aciona o gerador; o conteúdo passa por validação editorial; o PDF recebe capa, objetivos, resumo, explicação, exemplos, exercícios e referências; o arquivo é renderizado, revisado visualmente e publicado no Storage do Supabase.
+**Fluxo:** a aula aprovada aciona o gerador; o conteúdo passa por validação editorial; o PDF recebe capa, objetivos, resumo, explicação, exemplos, imagens didáticas com referência, exercícios e fontes finais; o arquivo é renderizado, revisado visualmente e publicado no Storage do Supabase.
 
 **Critérios de aceite:**
 
 1. O PDF usa identidade OdontoTrack e contém a versão da aula.
 2. A revisão bloqueia texto com travessão, fontes sem referência ou conteúdo sem aprovação.
-3. O aluno abre o PDF em tablet e celular, e acessa alternativa HTML na aula.
+3. Todo PDF tem ao menos uma fonte verificável ao final e cada imagem tem legenda e origem.
+4. O aluno abre o PDF em tablet e celular, e acessa alternativa HTML na aula.
 
 ## Evidência obrigatória por card
 
