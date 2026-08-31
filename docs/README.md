@@ -1,5 +1,12 @@
 # Documentação do OdontoTrack
 
+## Para validar o produto antes do desenvolvimento
+
+- [Visão do SaaS](saas-overview.md): fluxo que o aluno percorre.
+- [Blueprint de implementação](implementation-blueprint.md): estrutura de código, banco, passos e critérios de aceite.
+- [Curadoria de vídeos](video-curation.md): de onde vêm os vídeos e como entram na trilha.
+- [Sistema editorial do PDF](pdf-editorial-system.md): estrutura, identidade e regra sem travessão.
+
 - `product-requirements.md`: requisitos funcionais e não funcionais.
 - `technical-architecture.md`: arquitetura proposta com Vercel e Supabase.
 - `github-backlog.md`: épicos, cards e critério para movimentação.
