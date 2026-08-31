@@ -16,6 +16,7 @@
     "test:ot-12-change-review": "node scripts/test-ot-12-change-review.mjs",
     "test:ot-12-review-pipeline": "node scripts/test-ot-12-review-pipeline.mjs",
     "test:pmsp-notice-discovery": "node scripts/test-pmsp-notice-discovery.mjs",
+    "test:official-document-archive": "node scripts/test-official-document-archive.mjs",
     "test:editorial-review-queue": "node scripts/test-editorial-review-queue.mjs",
     "test:auth-contract": "node scripts/test-auth-contract.mjs"
   },
