@@ -10,6 +10,19 @@ function configuredRestClient({ url = process.env.SUPABASE_URL, serviceRoleKey =
   const baseUrl = new URL("rest/v1/", url.endsWith("/") ? url : `${url}/`);
 
   return {
+    async findOne(table, filters) {
+      const endpoint = new URL(table, baseUrl);
+      endpoint.searchParams.set("select", "id");
+      endpoint.searchParams.set("limit", "1");
+      for (const [key, value] of Object.entries(filters)) endpoint.searchParams.set(key, `eq.${value}`);
+      const response = await fetchImplementation(endpoint, {
+        headers: { apikey: serviceRoleKey, Authorization: `Bearer ${serviceRoleKey}` },
+        cache: "no-store",
+      });
+      if (!response.ok) throw new Error(`Supabase não aceitou consulta em ${table} (${response.status}).`);
+      const rows = await response.json();
+      return rows[0] ?? null;
+    },
     async insert(table, row, { onConflict, ignoreDuplicates = false } = {}) {
       const endpoint = new URL(table, baseUrl);
       if (onConflict) endpoint.searchParams.set("on_conflict", onConflict);
@@ -79,21 +92,30 @@ export function createSupabaseCollectorPersistence(options = {}) {
   const client = options.client ?? configuredRestClient(options);
   return {
     async persist(result) {
-      await client.insert("collection_runs", runRow(result));
+      const existingSnapshot = result.runStatus === "failed" ? null : await client.findOne("source_snapshots", {
+        source_key: result.sourceKey,
+        canonical_url: result.canonicalUrl,
+        content_hash: result.contentHash,
+      });
+      const effectiveResult = existingSnapshot
+        ? { ...result, runStatus: "unchanged", snapshotCreated: false }
+        : result;
+      const savedRun = await client.insert("collection_runs", runRow(effectiveResult));
+      const runId = savedRun[0]?.id ?? null;
       if (result.runStatus === "failed") return { runRecorded: true, snapshotRecorded: false };
-      if (result.snapshotCreated) {
-        await client.insert("source_snapshots", snapshotRow(result), {
+      if (!existingSnapshot) {
+        const savedSnapshot = await client.insert("source_snapshots", snapshotRow(effectiveResult), {
           onConflict: "source_key,canonical_url,content_hash",
           ignoreDuplicates: true,
         });
-        return { runRecorded: true, snapshotRecorded: true };
+        return { runRecorded: true, snapshotRecorded: true, runId, snapshotId: savedSnapshot[0]?.id ?? null, runStatus: effectiveResult.runStatus };
       }
-      await client.update(
+      const updatedSnapshot = await client.update(
         "source_snapshots",
-        { last_seen_at: result.completedAt },
+        { last_seen_at: effectiveResult.completedAt },
         { source_key: result.sourceKey, canonical_url: result.canonicalUrl, content_hash: result.contentHash },
       );
-      return { runRecorded: true, snapshotRecorded: false };
+      return { runRecorded: true, snapshotRecorded: false, runId, snapshotId: updatedSnapshot[0]?.id ?? existingSnapshot.id, runStatus: effectiveResult.runStatus };
     },
   };
 }

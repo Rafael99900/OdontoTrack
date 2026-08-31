@@ -29,9 +29,15 @@ try {
 }
 
 const calls = [];
+let existingSnapshot = null;
 const client = {
-  insert: async (...args) => { calls.push(["insert", ...args]); return []; },
-  update: async (...args) => { calls.push(["update", ...args]); return []; },
+  findOne: async (...args) => { calls.push(["findOne", ...args]); return existingSnapshot; },
+  insert: async (table, row, options) => {
+    calls.push(["insert", table, row, options]);
+    if (table === "source_snapshots") existingSnapshot = { id: "snapshot-1" };
+    return [{ id: table === "collection_runs" ? `run-${calls.filter(([kind, candidate]) => kind === "insert" && candidate === "collection_runs").length}` : "snapshot-1" }];
+  },
+  update: async (...args) => { calls.push(["update", ...args]); return [{ id: "snapshot-1" }]; },
 };
 const persistence = createSupabaseCollectorPersistence({ client });
 const initial = {
@@ -46,13 +52,16 @@ const initial = {
   snapshotCreated: true,
   metadata: { contentType: "text/html", byteLength: 10 },
 };
-await persistence.persist(initial);
-await persistence.persist({ ...initial, startedAt: "2026-08-31T12:01:00Z", completedAt: "2026-08-31T12:01:01Z", runStatus: "unchanged", snapshotCreated: false });
+const first = await persistence.persist(initial);
+const second = await persistence.persist({ ...initial, startedAt: "2026-08-31T12:01:00Z", completedAt: "2026-08-31T12:01:01Z", runStatus: "change_detected", snapshotCreated: true });
 
 const runWrites = calls.filter(([kind, table]) => kind === "insert" && table === "collection_runs");
 const snapshotWrites = calls.filter(([kind, table]) => kind === "insert" && table === "source_snapshots");
 const snapshotUpdates = calls.filter(([kind, table]) => kind === "update" && table === "source_snapshots");
 if (runWrites.length !== 2 || snapshotWrites.length !== 1 || snapshotUpdates.length !== 1) {
   throw new Error("Contrato de persistência idempotente inválido.");
+}
+if (first.runStatus !== "change_detected" || second.runStatus !== "unchanged" || !first.runId || !second.runId || second.snapshotId !== "snapshot-1") {
+  throw new Error("Resultados persistidos não informam ids ou status esperado.");
 }
 console.log("PMSP Supabase persistence contract passed: missing config fails; 2 runs, 1 snapshot insert, 1 last-seen update.");

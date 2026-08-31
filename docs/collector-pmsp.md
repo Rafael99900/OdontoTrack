@@ -31,5 +31,42 @@ npm run test:collector-pmsp-supabase
 
 Quando configurado, cada execução insere uma linha em `collection_runs`. Um hash
 novo cria `source_snapshots`; hash igual atualiza `last_seen_at` do snapshot já
-existente e não cria outro. Não registre valores de chaves em logs, arquivos de
-estado ou commits.
+existente e não cria outro. A verificação do hash igual é feita no Supabase,
+portanto continua válida em execuções server-side sem estado local compartilhado.
+O log do comando exibe apenas IDs retornados, hash, URL e status; nunca registre
+valores de chaves em logs, arquivos de estado ou commits.
+
+## Procedimento de finalização autorizado
+
+Executar apenas depois que o responsável confirmar que as migrations pendentes
+foram aplicadas pelo fluxo aprovado do projeto Supabase e que as duas variáveis
+server-only estão configuradas no job/deployment Vercel. Não cole nem inspecione
+os valores das variáveis.
+
+1. No ambiente server-side autorizado, confirme que a versão implantada contém
+   `c724086` e `5533615` (ou posteriores).
+2. Pelo mecanismo aprovado do Supabase, aplique somente migrations pendentes
+   `002`, `003` e as de controle de acesso posteriores; não execute SQL ad hoc
+   em produção.
+3. Execute duas vezes `npm run collect:pmsp:supabase`, preservando os dois logs
+   sanitizados do job. O segundo deve exibir `runStatus: "unchanged"` e o mesmo
+   `snapshotId` da primeira execução, com um `runId` novo.
+4. No SQL Editor do mesmo ambiente, execute a consulta abaixo, substituindo
+   apenas o hash exibido no log. Registre no card somente IDs, timestamps, hash,
+   URL canônica, status HTTP, status e URL do deployment/job.
+
+```sql
+select id, canonical_url, content_hash, http_status, run_status, started_at, completed_at
+from public.collection_runs
+where source_key = 'sp-clic-concursos' and content_hash = '<hash-do-log>'
+order by started_at desc
+limit 2;
+
+select id, canonical_url, content_hash, first_seen_at, last_seen_at, review_required
+from public.source_snapshots
+where source_key = 'sp-clic-concursos' and content_hash = '<hash-do-log>';
+```
+
+O aceite é: duas linhas de `collection_runs`, uma `change_detected` e outra
+`unchanged`, e uma única linha de `source_snapshots`. Se uma variável estiver
+ausente, `collect:pmsp:supabase` deve abortar antes de rede/escrita com código 2.
