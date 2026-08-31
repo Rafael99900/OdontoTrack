@@ -36,7 +36,9 @@ const sourcePage = 31;
  * informação aparentemente oficial.
  */
 export function createNoticeCourseDraft(notice: FirstRealNoticeCandidate): NoticeCourseDraft {
-  const approved = notice.editorialStatus === "approved";
+  // O primeiro candidato local é tipado literalmente como pending_review,
+  // enquanto um registro carregado do banco pode chegar aprovado.
+  const approved = String(notice.editorialStatus) === "approved";
   return {
     noticeId: notice.id,
     title: `Trilha de ${notice.position.title} · ${notice.municipality}`,
