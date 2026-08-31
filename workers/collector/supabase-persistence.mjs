@@ -5,14 +5,14 @@ export class SupabasePersistenceConfigurationError extends Error {
   }
 }
 
-function configuredRestClient({ url = process.env.SUPABASE_URL, serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY, fetchImplementation = fetch } = {}) {
+export function createSupabaseRestClient({ url = process.env.SUPABASE_URL, serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY, fetchImplementation = fetch } = {}) {
   if (!url || !serviceRoleKey) throw new SupabasePersistenceConfigurationError();
   const baseUrl = new URL("rest/v1/", url.endsWith("/") ? url : `${url}/`);
 
   return {
-    async findOne(table, filters) {
+    async findOne(table, filters, { select = "id" } = {}) {
       const endpoint = new URL(table, baseUrl);
-      endpoint.searchParams.set("select", "id");
+      endpoint.searchParams.set("select", select);
       endpoint.searchParams.set("limit", "1");
       for (const [key, value] of Object.entries(filters)) endpoint.searchParams.set(key, `eq.${value}`);
       const response = await fetchImplementation(endpoint, {
@@ -89,7 +89,7 @@ function snapshotRow(result) {
 }
 
 export function createSupabaseCollectorPersistence(options = {}) {
-  const client = options.client ?? configuredRestClient(options);
+  const client = options.client ?? createSupabaseRestClient(options);
   return {
     async persist(result) {
       const existingSnapshot = result.runStatus === "failed" ? null : await client.findOne("source_snapshots", {
