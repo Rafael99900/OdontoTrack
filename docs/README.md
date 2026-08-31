@@ -6,6 +6,7 @@
 - [Blueprint de implementação](implementation-blueprint.md): estrutura de código, banco, passos e critérios de aceite.
 - [Curadoria de vídeos](video-curation.md): de onde vêm os vídeos e como entram na trilha.
 - [Sistema editorial do PDF](pdf-editorial-system.md): estrutura, identidade e regra sem travessão.
+- [IA e fontes oficiais](ai-and-official-sources.md): provedor inicial, segurança, coleta e convenção `data-cy`.
 
 - `product-requirements.md`: requisitos funcionais e não funcionais.
 - `technical-architecture.md`: arquitetura proposta com Vercel e Supabase.
