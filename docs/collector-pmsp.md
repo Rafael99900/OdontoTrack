@@ -16,3 +16,20 @@ O arquivo de estado é local e substitui temporariamente o banco para demonstrar
 - O comando não grava em Supabase, Storage nem cria agendamento.
 - O filtro por Odontologia/escolaridade ainda não é aplicado: a fonte de índice não fornece, de forma estruturada e verificável, fatos de um edital específico nesta etapa.
 - A passagem de snapshot para `notices`/`notice_versions` depende de extrator de documentos e revisão editorial com evidência por página/trecho.
+
+## Persistência opt-in no Supabase
+
+O comando abaixo é separado da coleta local e exige somente variáveis de
+servidor: `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY`. Nenhuma variável
+`NEXT_PUBLIC_*` é usada ou aceita. Sem as duas variáveis, ele encerra com código
+2 antes de iniciar a coleta ou qualquer escrita.
+
+```sh
+npm run collect:pmsp:supabase
+npm run test:collector-pmsp-supabase
+```
+
+Quando configurado, cada execução insere uma linha em `collection_runs`. Um hash
+novo cria `source_snapshots`; hash igual atualiza `last_seen_at` do snapshot já
+existente e não cria outro. Não registre valores de chaves em logs, arquivos de
+estado ou commits.

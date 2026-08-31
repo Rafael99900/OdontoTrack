@@ -9,7 +9,9 @@
     "lint": "eslint",
     "validate:ot-10": "node scripts/validate-ot-10.mjs",
     "collect:pmsp": "node scripts/collect-pmsp.mjs",
-    "test:collector-pmsp": "node scripts/test-pmsp-collector.mjs"
+    "test:collector-pmsp": "node scripts/test-pmsp-collector.mjs",
+    "collect:pmsp:supabase": "node scripts/collect-pmsp-to-supabase.mjs",
+    "test:collector-pmsp-supabase": "node scripts/test-pmsp-supabase-persistence.mjs"
   },
   "dependencies": {
     "next": "16.3.3",
