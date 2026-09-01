@@ -33,10 +33,10 @@ function textFromHtml(value) {
   return decodeHtml(value.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim());
 }
 
-function absoluteOfficialUrl(href, baseUrl) {
+function absoluteOfficialUrl(href, baseUrl, allowedHosts = OFFICIAL_HOSTS) {
   try {
     const url = new URL(decodeHtml(href.trim()), baseUrl);
-    if (url.protocol !== "https:" || !OFFICIAL_HOSTS.has(url.hostname)) return null;
+    if (url.protocol !== "https:" || !allowedHosts.has(url.hostname)) return null;
     return url;
   } catch {
     return null;
@@ -102,8 +102,17 @@ export async function fetchPmspNoticeDocumentCandidates({ fetchPage = fetch, sou
  * propositalmente responsabilidade de uma etapa posterior e editorial.
  */
 export async function fetchVerifiedPmspPdf({ documentUrl, fetchPage = fetch, maxBytes = MAX_PDF_BYTES } = {}) {
+  return fetchVerifiedOfficialPdf({ documentUrl, fetchPage, maxBytes, allowedHosts: OFFICIAL_HOSTS });
+}
+
+/**
+ * Verifica um PDF hospedado em uma lista explícita de domínios oficiais. A
+ * lista é fornecida pelo adaptador municipal, nunca pelo cliente da API.
+ */
+export async function fetchVerifiedOfficialPdf({ documentUrl, fetchPage = fetch, maxBytes = MAX_PDF_BYTES, allowedHosts } = {}) {
   if (!documentUrl) throw new OfficialDocumentValidationError("A URL do documento é obrigatória.");
-  const requestedUrl = absoluteOfficialUrl(documentUrl, documentUrl);
+  if (!(allowedHosts instanceof Set) || allowedHosts.size === 0) throw new OfficialDocumentValidationError("A lista de domínios oficiais não foi configurada.");
+  const requestedUrl = absoluteOfficialUrl(documentUrl, documentUrl, allowedHosts);
   if (!requestedUrl) throw new OfficialDocumentValidationError("O documento deve estar em HTTPS e host oficial permitido.");
 
   const response = await fetchPage(requestedUrl, {
@@ -112,7 +121,7 @@ export async function fetchVerifiedPmspPdf({ documentUrl, fetchPage = fetch, max
   });
   if (!response.ok) throw new OfficialDocumentValidationError(`Documento oficial indisponível (HTTP ${response.status}).`);
 
-  const finalUrl = absoluteOfficialUrl(response.url || requestedUrl.toString(), requestedUrl.toString());
+  const finalUrl = absoluteOfficialUrl(response.url || requestedUrl.toString(), requestedUrl.toString(), allowedHosts);
   if (!finalUrl) throw new OfficialDocumentValidationError("O redirecionamento do documento saiu do host oficial permitido.");
   const contentType = response.headers.get("content-type")?.toLowerCase() ?? "";
   if (!contentType.includes("application/pdf")) throw new OfficialDocumentValidationError("O documento não informou content-type PDF.");
