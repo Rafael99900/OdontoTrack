@@ -34,6 +34,24 @@ export function MagicLinkForm() {
     }
   }
 
+  async function signInWithGoogle() {
+    setStatus("loading");
+    setMessage("");
+    try {
+      const client = createSupabaseBrowserClient();
+      const { error } = await client.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: `${window.location.origin}/auth/callback` },
+      });
+      if (error) throw error;
+    } catch (error) {
+      setStatus("error");
+      setMessage(error instanceof SupabaseAuthConfigurationError
+        ? "O login com Google ainda não está disponível neste ambiente."
+        : "Não foi possível iniciar o login com Google. Tente novamente.");
+    }
+  }
+
   return (
     <form onSubmit={submit} data-cy="auth-magic-link-form" aria-busy={status === "loading"}>
       <label htmlFor="email">Seu e-mail</label>
@@ -51,6 +69,16 @@ export function MagicLinkForm() {
         {status === "loading" ? "Enviando link…" : "Enviar link de acesso"}
       </button>
       {message && <p data-cy="auth-status" role={status === "error" ? "alert" : "status"}>{message}</p>}
+      <div className="auth-divider" aria-hidden="true">ou</div>
+      <button
+        data-cy="auth-google-sign-in"
+        className="auth-google-button"
+        type="button"
+        onClick={signInWithGoogle}
+        disabled={status === "loading"}
+      >
+        Continuar com Google
+      </button>
     </form>
   );
 }

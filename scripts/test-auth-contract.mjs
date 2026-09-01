@@ -8,7 +8,7 @@ const files = [
 ];
 const source = await Promise.all(files.map((file) => readFile(file, "utf8")));
 const contract = source.join("\n");
-for (const fragment of ["createBrowserClient", "createServerClient", "signInWithOtp", "exchangeCodeForSession", "data-cy=\"auth-send-magic-link\""]) {
+for (const fragment of ["createBrowserClient", "createServerClient", "signInWithOtp", "signInWithOAuth", "provider: \"google\"", "exchangeCodeForSession", "data-cy=\"auth-send-magic-link\"", "data-cy=\"auth-google-sign-in\""]) {
   if (!contract.includes(fragment)) throw new Error(`Contrato de autenticação ausente: ${fragment}`);
 }
 if (contract.includes("SUPABASE_SERVICE_ROLE_KEY")) throw new Error("Auth não pode usar service role.");
