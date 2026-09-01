@@ -16,6 +16,10 @@ export async function POST(request: Request) {
     const result = await persistFirstRealMauaNotice();
     return NextResponse.json(result, { status: 201 });
   } catch (error) {
+    console.error("Falha sanitizada ao persistir edital de Mauá", {
+      name: error instanceof Error ? error.name : "UnknownError",
+      message: error instanceof Error ? error.message : "Erro desconhecido",
+    });
     if (error instanceof OfficialDocumentValidationError) return NextResponse.json({ error: error.message }, { status: 422 });
     if (error instanceof OperationalTokenConfigurationError || error instanceof SupabasePersistenceConfigurationError || error instanceof OfficialDocumentArchiveError) {
       return NextResponse.json({ error: "Persistência editorial indisponível." }, { status: 503 });
