@@ -13,6 +13,10 @@ Atualizado em 01/09/2026. Este documento descreve o que já foi verificado no c�
 
 O viewport de 800 x 1280 representa o Galaxy Tab S6 Lite em retrato. Os tamanhos 360 e 412 representam celulares Android e iPhones atuais. A checagem visual em dispositivo ou navegador real continua obrigatória antes de classificar OT-31 ou OT-43 como concluídos.
 
+## Verificação publicada
+
+Em 01/09/2026, a rota publicada de login foi inspecionada em 360 x 800, 800 x 1280 e 1280 x 800. Em todos os tamanhos, o documento manteve `scrollWidth` igual a `clientWidth`, sem rolagem horizontal, e expôs o título e os três controles esperados: e-mail, envio de link e entrada Google. Esta é uma evidência de estrutura e não substitui a navegação autenticada em dispositivo real.
+
 ## Controles de acessibilidade implementados
 
 - Foco de teclado visível em links, botões, campos, área de texto e itens expansíveis.
