@@ -22,8 +22,12 @@
     "test:collector-grande-abc": "node scripts/test-grande-abc-collector.mjs",
     "test:maua-official-document": "node scripts/test-maua-official-document.mjs",
     "test:editorial-review-queue": "node scripts/test-editorial-review-queue.mjs",
+    "persist:first-real-maua": "node scripts/persist-first-real-maua-notice.mjs",
+    "test:first-real-maua-persistence": "node scripts/test-first-real-maua-persistence.mjs",
     "test:auth-contract": "node scripts/test-auth-contract.mjs",
-    "test:production-readiness": "node scripts/test-production-readiness.mjs"
+    "test:production-readiness": "node scripts/test-production-readiness.mjs",
+    "generate:lesson-pdf": "python scripts/generate-sus-lesson-pdf.py",
+    "test:learning-content": "node scripts/test-learning-content.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.5",

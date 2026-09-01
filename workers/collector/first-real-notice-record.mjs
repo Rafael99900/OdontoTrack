@@ -1,0 +1,25 @@
+export const firstRealNoticeRecord = {
+  externalReference: "maua-cp-01-2025-cirurgiao-dentista-20h",
+  title: "Concurso Público 01/2025 · Cirurgião Dentista 20h",
+  municipality: "Mauá",
+  organizationName: "Prefeitura do Município de Mauá",
+  sourceUrl: "https://www.maua.sp.gov.br/Concursos/Detalhes/2025/11",
+  documentUrl: "https://dom.maua.sp.gov.br/public/docs/6ecd834695e6ea7958f1f7c1aa804bde.pdf",
+  publicationDate: "2025-12-17",
+  position: { title: "Cirurgião Dentista 20h", vacancies: 5, remunerationCents: 328743, workloadHoursWeek: 20 },
+  evidence: [
+    { key: "position", page: 2, excerpt: "CIRURGIÃO DENTISTA 20H: 5 vagas, ensino superior completo em Odontologia, registro no conselho profissional, 20 horas semanais e referência remuneratória de R$ 3.287,43." },
+    { key: "registration", page: null, sourceUrl: "https://www.maua.sp.gov.br/Concursos/Detalhes/2025/11", extractionMethod: "web_capture", excerpt: "Edital 01/2025, inscrições de 18 de dezembro de 2025 a 29 de janeiro de 2026, pelo IBAM." },
+    { key: "exam", page: 12, excerpt: "A aplicação das provas objetivas está prevista para 15 de março de 2026, observada convocação posterior." },
+    { key: "syllabus", page: 31, excerpt: "O conteúdo específico de Cirurgião Dentista abrange SUS, atenção básica, saúde bucal, dentística, oclusão, prevenção, farmacologia, periodontia, odontopediatria, cirurgia, urgência, endodontia e biossegurança." },
+  ],
+  facts: [
+    { key: "registration_period", value: { text: "18/12/2025 a 29/01/2026" }, evidenceKey: "registration" },
+    { key: "exam_date", value: { date: "2026-03-15", certainty: "planned", note: "Depende de confirmação por convocação." }, evidenceKey: "exam" },
+    { key: "syllabus", value: { text: "SUS, atenção básica, saúde bucal, dentística, oclusão, prevenção, farmacologia, periodontia, odontopediatria, cirurgia, urgência, endodontia e biossegurança." }, evidenceKey: "syllabus" },
+    { key: "vacancies", value: { total: 5, pcd: 1 }, evidenceKey: "position", positionScoped: true },
+    { key: "remuneration", value: { cents: 328743, currency: "BRL", reference: "dezembro de 2025" }, evidenceKey: "position", positionScoped: true },
+    { key: "requirements", value: { text: "Ensino superior completo em Odontologia e registro no conselho profissional." }, evidenceKey: "position", positionScoped: true },
+    { key: "workload", value: { hours_week: 20 }, evidenceKey: "position", positionScoped: true },
+  ],
+};

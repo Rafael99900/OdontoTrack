@@ -21,3 +21,9 @@ Vídeos externos não são copiados nem baixados pelo sistema. O editor registra
 ## Segurança
 
 Todas as tabelas de produção são privadas por padrão. Apenas operações de servidor podem gravar cursos e ativos. A futura publicação para o aluno deverá usar uma função controlada que confira status do edital, evidências, referências e revisão editorial.
+
+## Implementação da primeira prévia
+
+A primeira prévia de conteúdo está registrada em `src/lib/learning/maua-dentistry-production.ts`. Ela vincula explicitamente o Anexo II, página 31, do edital de Mauá à Lei nº 8.080/1990. A página de cursos apresenta resumo, questões autorais, prompt para NotebookLM, áudio pelo dispositivo, link UNA-SUS e PDF editorial. Consulte `docs/first-course-content-delivery.md` para a matriz de fontes e as regras de publicação.
+
+A rota de IA exige usuário autenticado e recebe uma chave de aula. O servidor monta o contexto e as fontes permitidas. O cliente não pode trocar URLs de fonte nem escolher um contexto de edital arbitrário.

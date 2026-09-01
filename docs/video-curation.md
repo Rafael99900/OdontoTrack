@@ -47,3 +47,7 @@ Para começar, use uma combinação de vídeos próprios curtos e incorporados a
 ## Fallback
 
 Se um vídeo ficar indisponível, a aula mantém resumo, PDF, questões e áudio. O sistema avisa o administrador e apresenta um substituto somente depois de nova aprovação.
+
+## Primeiro link avaliado
+
+Para a aula de SUS e atenção básica, a prévia apresenta o curso "Situações Odontológicas Comuns em Atenção Primária à Saúde", da Universidade Federal de Pelotas pela UNA-SUS. A página de origem informa público voltado a profissionais de odontologia na atenção primária e carga horária de 45 horas. O produto usa apenas o link de saída. Ele não baixa, republica nem incorpora o conteúdo antes da validação específica de licença e compatibilidade de incorporação.

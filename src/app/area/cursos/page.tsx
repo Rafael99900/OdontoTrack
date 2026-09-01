@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { createNoticeCourseDraft } from "@/lib/courses/notice-course-draft";
+import { LessonStudio } from "@/features/learning/lesson-studio";
 import { firstRealNoticeCandidate } from "@/lib/notices/first-real-notice";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -26,6 +27,7 @@ export default async function CursosPage() {
     <section className="course-modules" data-cy="course-draft-modules">
       {course.modules.map((module) => <article key={module.id}><span className="tag">MÓDULO</span><h2>{module.title}</h2>{module.lessons.map((lesson) => <div className="course-lesson" key={lesson.id}><div><b>{lesson.title}</b><p>{lesson.objective}</p></div><small>Fonte: pág. {lesson.evidencePage}</small></div>)}</article>)}
     </section>
+    <LessonStudio />
     <section className="editorial-grid" data-cy="course-production-rules"><article><span className="tag">PADRÃO DE PRODUÇÃO</span><h2>Vídeo, PDF, áudio e questões</h2><ol>{course.productionRules.map((rule) => <li key={rule}>{rule}</li>)}</ol></article></section>
   </main>;
 }

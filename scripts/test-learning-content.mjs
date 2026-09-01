@@ -1,0 +1,12 @@
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+const content = await readFile(new URL("../src/lib/learning/maua-dentistry-production.ts", import.meta.url), "utf8");
+const pdfScript = await readFile(new URL("./generate-sus-lesson-pdf.py", import.meta.url), "utf8");
+assert.match(content, /Edital de abertura 01\/2025 de Mauá/);
+assert.match(content, /Lei nº 8\.080\/1990/);
+assert.match(content, /unasus\.gov\.br\/cursos\/curso\/44644/);
+assert.match(content, /notebookPrompt/); assert.match(content, /audioScript/);
+assert.equal(content.includes("—"), false, "Conteúdo do aluno não pode conter travessão.");
+assert.match(pdfScript, /Fontes consultadas/); assert.match(pdfScript, /Ilustração autoral OdontoTrack/);
+assert.equal(pdfScript.includes("—"), false, "Gerador de PDF não pode inserir travessão.");
+console.log("Learning content contract passed.");
