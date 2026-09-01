@@ -22,7 +22,8 @@
     "test:collector-grande-abc": "node scripts/test-grande-abc-collector.mjs",
     "test:maua-official-document": "node scripts/test-maua-official-document.mjs",
     "test:editorial-review-queue": "node scripts/test-editorial-review-queue.mjs",
-    "test:auth-contract": "node scripts/test-auth-contract.mjs"
+    "test:auth-contract": "node scripts/test-auth-contract.mjs",
+    "test:production-readiness": "node scripts/test-production-readiness.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.5",
