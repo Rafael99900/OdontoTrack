@@ -35,6 +35,15 @@ const duplicate = await archiveOfficialPdf({
 });
 if (!duplicate.alreadyArchived) throw new Error("Conflito de hash deveria ser tratado como cópia já arquivada.");
 
+const storageDuplicate = await archiveOfficialPdf({
+  sourceKey: "sp-clic-concursos",
+  document: { bytes: pdf },
+  supabaseUrl: "https://example.supabase.co",
+  serviceRoleKey: "secret",
+  fetchImplementation: async () => new Response(JSON.stringify({ statusCode: "409", code: "KeyAlreadyExists" }), { status: 400 }),
+});
+if (!storageDuplicate.alreadyArchived) throw new Error("Resposta de duplicidade do Storage deveria ser idempotente.");
+
 try {
   await archiveOfficialPdf({
     sourceKey: "sp-clic-concursos",

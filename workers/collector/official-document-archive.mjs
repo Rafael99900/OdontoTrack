@@ -68,8 +68,11 @@ export async function archiveOfficialPdf({
     body: document.bytes,
   });
 
-  if (!response.ok && response.status !== 409) {
-    const detail = (await response.text()).replace(/\s+/g, " ").slice(0, 220);
+  const errorDetail = response.ok ? "" : (await response.text()).replace(/\s+/g, " ").slice(0, 220);
+  const duplicateObject = response.status === 409
+    || /"statusCode"\s*:\s*"?409"?|KeyAlreadyExists/i.test(errorDetail);
+  if (!response.ok && !duplicateObject) {
+    const detail = errorDetail;
     throw new OfficialDocumentArchiveError(`Não foi possível arquivar o PDF oficial (${response.status}): ${detail || "sem detalhe"}`);
   }
 
@@ -79,6 +82,6 @@ export async function archiveOfficialPdf({
     contentHash,
     contentType: "application/pdf",
     byteLength: document.bytes.byteLength,
-    alreadyArchived: response.status === 409,
+    alreadyArchived: !response.ok && duplicateObject,
   };
 }
