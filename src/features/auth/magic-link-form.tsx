@@ -5,7 +5,7 @@ import { FormEvent, useState } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { SupabaseAuthConfigurationError } from "@/lib/supabase/config";
 
-export function MagicLinkForm() {
+export function MagicLinkForm({ className }: { className?: string }) {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "sent" | "error">("idle");
   const [message, setMessage] = useState("");
@@ -53,7 +53,7 @@ export function MagicLinkForm() {
   }
 
   return (
-    <form onSubmit={submit} data-cy="auth-magic-link-form" aria-busy={status === "loading"}>
+    <form className={className} onSubmit={submit} data-cy="auth-magic-link-form" aria-busy={status === "loading"}>
       <label htmlFor="email">Seu e-mail</label>
       <input
         id="email"
@@ -62,13 +62,15 @@ export function MagicLinkForm() {
         value={email}
         onChange={(event) => setEmail(event.target.value)}
         autoComplete="email"
+        aria-describedby="auth-login-help auth-status"
         required
         disabled={status === "loading"}
       />
       <button data-cy="auth-send-magic-link" type="submit" disabled={status === "loading"}>
         {status === "loading" ? "Enviando link…" : "Enviar link de acesso"}
       </button>
-      {message && <p data-cy="auth-status" role={status === "error" ? "alert" : "status"}>{message}</p>}
+      <p id="auth-login-help" className="auth-help">Use seu e-mail de acesso. Prefira Google se o link por e-mail expirar.</p>
+      <p id="auth-status" className={status === "error" ? "auth-status auth-status-error" : "auth-status"} data-cy="auth-status" role={status === "error" ? "alert" : "status"} aria-live={status === "error" ? "assertive" : "polite"} aria-atomic="true">{message}</p>
       <div className="auth-divider" aria-hidden="true">ou</div>
       <button
         data-cy="auth-google-sign-in"

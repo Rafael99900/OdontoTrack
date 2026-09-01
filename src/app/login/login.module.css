@@ -1,0 +1,72 @@
+.page {
+  width: min(100%, 560px);
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: clamp(28px, 7vw, 72px) clamp(18px, 5vw, 40px);
+  display: grid;
+  align-content: center;
+  gap: 16px;
+}
+
+.page h1 {
+  margin: 0;
+  font-size: clamp(2rem, 7vw, 3rem);
+  line-height: 1.1;
+  letter-spacing: -.04em;
+}
+
+.intro {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.error {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid #bc4b4b;
+  border-radius: 10px;
+  background: #fff2f2;
+  color: #782323;
+  line-height: 1.45;
+}
+
+.form {
+  display: grid;
+  gap: 10px;
+  padding: clamp(18px, 5vw, 28px);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 16px 40px rgba(7, 87, 79, .08);
+}
+
+.form label {
+  font-weight: 700;
+}
+
+.form input {
+  width: 100%;
+  border: 1px solid #8ba9a3;
+  border-radius: 9px;
+  padding: 11px 12px;
+  color: var(--ink);
+  background: #fff;
+  font: inherit;
+}
+
+.form button {
+  width: 100%;
+}
+
+.help,
+.status {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: .9rem;
+  line-height: 1.45;
+}
+
+.statusError {
+  color: #782323;
+}
