@@ -1,7 +1,18 @@
 import { classifyPersistedCapture, createReviewWritePlan, persistReviewWritePlan } from "./notice-change-review.mjs";
 import { createSupabaseRestClient } from "./supabase-persistence.mjs";
 
-const OFFICIAL_SOURCE_KEYS = new Set(["sp-clic-concursos"]);
+// Somente adaptadores declarados e hospedados em infraestrutura municipal
+// entram na fila. A presença nesta lista não publica o conteúdo capturado.
+const OFFICIAL_SOURCE_KEYS = new Set([
+  "sp-clic-concursos",
+  "maua-concursos",
+  "santo-andre-editais",
+  "sao-bernardo-concursos",
+  "ribeirao-pires-editais",
+  "sao-caetano-concursos",
+  "diadema-diario-oficial",
+  "rio-grande-serra-legislacao",
+]);
 
 export class OfficialSnapshotRequiredError extends Error {
   constructor() {

@@ -22,6 +22,27 @@ export const GRANDE_ABC_SOURCES = [
     municipality: "Ribeirão Pires",
     kind: "official_portal",
   },
+  {
+    key: "sao-caetano-concursos",
+    name: "Prefeitura de São Caetano do Sul: Concursos e convocações",
+    requestedUrl: "https://www.saocaetanodosul.sp.gov.br/paginasweb/47",
+    municipality: "São Caetano do Sul",
+    kind: "official_portal",
+  },
+  {
+    key: "diadema-diario-oficial",
+    name: "Prefeitura de Diadema: Diário Oficial",
+    requestedUrl: "https://www.diadema.sp.gov.br/diario-oficial/",
+    municipality: "Diadema",
+    kind: "official_gazette",
+  },
+  {
+    key: "rio-grande-serra-legislacao",
+    name: "Prefeitura de Rio Grande da Serra: Legislação e atos",
+    requestedUrl: "https://www.riograndedaserra.sp.gov.br/legislacao/decretos/",
+    municipality: "Rio Grande da Serra",
+    kind: "official_portal",
+  },
 ];
 
 export async function collectGrandeAbcSources(options) {

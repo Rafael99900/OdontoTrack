@@ -4,6 +4,8 @@ Esta é a fonte de refinamento do GitHub Project. Protótipos, mocks e dados dem
 
 **Definição de pronto comum:** código revisado e integrado; testes relevantes aprovados; estados de erro/vazio/permissão cobertos; documentação atualizada; sem bloqueio crítico; evidência de aceite anexada ao card.
 
+> Status e evidências verificadas em 31/08/2026 estão no [quadro executivo](execution-board.md). Este arquivo mantém o refinamento INVEST de cada história; o GitHub Issue correspondente mantém o histórico de execução.
+
 | Épico | Resultado | Cards |
 |---|---|---|
 | Fundação e autenticação | Dados privados e persistentes | OT-01 a OT-03 |
@@ -11,6 +13,7 @@ Esta é a fonte de refinamento do GitHub Project. Protótipos, mocks e dados dem
 | Análise e decisão | Descoberta e decisão explicável | OT-20 a OT-23 |
 | Trilha de aprendizagem | Capítulos completos e progresso real | OT-30 a OT-34 |
 | Conteúdo, IA e qualidade | Conteúdo licenciado, IA segura e inclusão | OT-40 a OT-43 |
+| Operação e confiabilidade | Jobs observáveis, recuperação e QA de produção | OT-15 |
 
 ## Fundação e autenticação
 
@@ -62,3 +65,19 @@ Esta é a fonte de refinamento do GitHub Project. Protótipos, mocks e dados dem
 - `Todo`: card refinado, sem implementação iniciada.
 - `In Progress`: branch, commit ou execução verificável associada.
 - `Done`: definição de pronto e evidência esperada atendidas.
+- `Em validação`: implementação ou configuração existe, mas falta comprovação independente do aceite. Não equivale a `Done`.
+- `Bloqueado`: há uma dependência externa concreta; o card deve informar dono, impacto e alternativa. Ausência de teste não é bloqueio, é trabalho pendente.
+
+## Rastreabilidade da execução atual
+
+| Objetivo do produto | Cards | Situação honesta | Evidência local | Próxima ação |
+|---|---|---|---|---|
+| Primeiro edital real | OT-12, OT-13 | Em andamento | `docs/first-real-notice-review.md`, `workers/collector/maua-official-document.mjs`, `scripts/test-maua-official-document.mjs` | Concluir decisão editorial persistida |
+| Coleta diária SP e Grande ABC | OT-11, OT-14 | Em andamento | `workers/collector/grande-abc-sources.mjs`, `vercel.json`, `scripts/test-grande-abc-collector.mjs` | Validar contratos e cobertura dos sete municípios |
+| Revisão editorial | OT-13 | Em andamento | `src/app/area/revisoes/page.tsx`, `scripts/test-editorial-review-queue.mjs` | Aplicar decisão de editor com auditoria |
+| Curso e trilha completos | OT-30, OT-32, OT-34, OT-40 | Em andamento | `supabase/migrations/008_editorial_learning_pipeline.sql`, `docs/learning-production-pipeline.md` | Gerar primeira trilha a partir de versão aprovada |
+| Acesso por e-mail/Google | OT-02 | Em validação | `src/features/auth`, `src/app/auth/callback/route.ts`, `scripts/test-auth-contract.mjs` | Confirmar o fluxo principal em produção sem depender de link expirado |
+| Dashboard e análise | OT-20, OT-21, OT-22 | A iniciar | `docs/product-requirements.md` | Conectar telas a dados aprovados |
+| IA com fonte | OT-41, OT-42 | A iniciar | `src/lib/ai/gemini.ts`, `docs/ai-and-official-sources.md` | Implementar recuperação e citações server-side |
+| Acessibilidade e dispositivos | OT-31, OT-43 | A iniciar | `src/lib/qa/selectors.ts` | Criar E2E e auditoria nos dispositivos-alvo |
+| Operação e QA | OT-15 | A iniciar | `scripts/test-production-readiness.mjs`, `vercel.json` | Definir alertas, backup e restauração |
