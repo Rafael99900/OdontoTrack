@@ -1,6 +1,6 @@
 # Quadro executivo de entrega
 
-Atualizado em 31/08/2026. Este é o registro de fonte de verdade para a execução do produto. Um item não é considerado concluído por possuir tela, mock, migration ou documentação isolada: precisa cumprir todos os critérios de aceite e apontar para evidência verificável.
+Atualizado em 01/09/2026. Este é o registro de fonte de verdade para a execução do produto. Um item não é considerado concluído por possuir tela, mock, migration ou documentação isolada: precisa cumprir todos os critérios de aceite e apontar para evidência verificável.
 
 ## Política operacional
 
@@ -14,21 +14,21 @@ Atualizado em 31/08/2026. Este é o registro de fonte de verdade para a execuç�
 | Objetivo | Card principal | Estado auditado | Evidência já disponível | Próximo portão de aceite |
 |---|---|---|---|---|
 | 1. Extrair e revisar o primeiro edital real | [OT-12](https://github.com/Rafael99900/OdontoTrack/issues/11), [OT-13](https://github.com/Rafael99900/OdontoTrack/issues/33) | Em andamento | Edital Mauá 01/2025 extraído e PDF oficial arquivado | Aprovar ou rejeitar a versão em fila, com decisão e histórico persistidos |
-| 2. Coleta diária e cobertura Grande ABC | OT-14 (criado para este escopo), [OT-11](https://github.com/Rafael99900/OdontoTrack/issues/10) | Em andamento | Coletores PMSP, Mauá e Grande ABC; cron Vercel | Rodar diariamente, registrar resultado por fonte e validar os 7 municípios do ABC |
+| 2. Coleta diária e cobertura Grande ABC | [OT-14](https://github.com/Rafael99900/OdontoTrack/issues/35), [OT-11](https://github.com/Rafael99900/OdontoTrack/issues/10) | Em andamento | Coletores PMSP, Mauá e Grande ABC; cron Vercel | Rodar diariamente, registrar resultado por fonte e validar os 7 municípios do ABC |
 | 3. Interface editorial de revisão | [OT-13](https://github.com/Rafael99900/OdontoTrack/issues/33) | Em andamento | Rota de revisão e fila editorial no código | Editor aprova/rejeita fatos e documentos reais com RLS e auditoria |
 | 4. Cursos, trilhas, questões, PDFs e mídia | [OT-30](https://github.com/Rafael99900/OdontoTrack/issues/16), [OT-32](https://github.com/Rafael99900/OdontoTrack/issues/18), [OT-34](https://github.com/Rafael99900/OdontoTrack/issues/22), [OT-40](https://github.com/Rafael99900/OdontoTrack/issues/24) | Em andamento | Schema editorial de aprendizagem e rascunho de curso | Gerar e publicar uma trilha completa somente a partir de edital aprovado |
 | 5. SMTP próprio Resend | [OT-02](https://github.com/Rafael99900/OdontoTrack/issues/7) | Em validação | SMTP customizado e login Google disponível | Confirmar entrega e retorno de um magic link novo ou tornar Google o único caminho inicial |
 | 6. Dashboard e análise verificável | [OT-20](https://github.com/Rafael99900/OdontoTrack/issues/12), [OT-21](https://github.com/Rafael99900/OdontoTrack/issues/13), [OT-22](https://github.com/Rafael99900/OdontoTrack/issues/14) | A iniciar após aprovação editorial | Protótipo e requisitos documentados | Consultar apenas dados aprovados, com filtro, versão, fonte e cálculo explicável |
 | 7. Assistente de IA factual e pedagógico | [OT-41](https://github.com/Rafael99900/OdontoTrack/issues/26), [OT-42](https://github.com/Rafael99900/OdontoTrack/issues/34) | A iniciar | Adaptador Gemini no servidor e política de fontes | Responder somente com contexto aprovado, citações e recusa segura quando faltar evidência |
 | 8. Experiência mobile, tablet e acessibilidade | [OT-31](https://github.com/Rafael99900/OdontoTrack/issues/17), [OT-43](https://github.com/Rafael99900/OdontoTrack/issues/28) | A iniciar | Convenção `data-cy` e protótipo responsivo | E2E e auditoria no Galaxy Tab S6 Lite, iPhones e Samsung atuais |
-| 9. Operação, QA, logs, backup e monitoramento | OT-15 (criado para este escopo) | A iniciar | Testes de contrato e cron protegidos | Pipeline de qualidade, alertas, política de backup e simulação de restauração documentada |
+| 9. Operação, QA, logs, backup e monitoramento | [OT-15](https://github.com/Rafael99900/OdontoTrack/issues/36) | A iniciar | Testes de contrato e cron protegidos | Pipeline de qualidade, alertas, política de backup e simulação de restauração documentada |
 
 ## Cards criados para fechar lacunas de rastreabilidade
 
-Os IDs abaixo são criados no GitHub durante a execução e devem substituir os marcadores OT-14/OT-15 desta página pelo link definitivo:
+Os cards complementares foram criados no GitHub em 01/09/2026:
 
-- **OT-14 Coleta diária de fontes oficiais do Grande ABC**: separa a cobertura regional do primeiro conector PMSP. Não rebaixa o aceite já registrado em OT-11.
-- **OT-15 Operação, observabilidade, backup e QA de produção**: concentra requisitos de confiabilidade que não cabem em uma história de interface.
+- [**OT-14 Coleta diária de fontes oficiais do Grande ABC**](https://github.com/Rafael99900/OdontoTrack/issues/35): separa a cobertura regional do primeiro conector PMSP. Não rebaixa o aceite já registrado em OT-11.
+- [**OT-15 Operação, observabilidade, backup e QA de produção**](https://github.com/Rafael99900/OdontoTrack/issues/36): concentra requisitos de confiabilidade que não cabem em uma história de interface.
 
 ## Critérios de aceite executivos
 
