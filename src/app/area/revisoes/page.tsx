@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 
 import { firstRealNoticeCandidate } from "@/lib/notices/first-real-notice";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { EditorialReviewActions } from "@/features/editorial/review-actions";
 
 export const dynamic = "force-dynamic";
 
@@ -54,6 +55,7 @@ export default async function RevisoesPage() {
           <p className="review-note">A aprovação será habilitada somente após o PDF ser arquivado em storage privado e os fatos receberem evidência por página.</p>
         </article>
       </section>
+      <EditorialReviewActions />
     </main>
   );
 }
