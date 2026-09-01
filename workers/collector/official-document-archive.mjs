@@ -69,7 +69,8 @@ export async function archiveOfficialPdf({
   });
 
   if (!response.ok && response.status !== 409) {
-    throw new OfficialDocumentArchiveError(`Não foi possível arquivar o PDF oficial (${response.status}).`);
+    const detail = (await response.text()).replace(/\s+/g, " ").slice(0, 220);
+    throw new OfficialDocumentArchiveError(`Não foi possível arquivar o PDF oficial (${response.status}): ${detail || "sem detalhe"}`);
   }
 
   return {
