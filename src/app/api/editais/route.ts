@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 
-import { CatalogConfigurationError, listPublishedNotices } from "@/lib/notices/catalog";
+import { CatalogConfigurationError, listVisibleNotices } from "@/lib/notices/catalog";
 
 export async function GET() {
   try {
-    const notices = await listPublishedNotices();
+    const notices = await listVisibleNotices();
     return NextResponse.json({ notices });
   } catch (error) {
     if (error instanceof CatalogConfigurationError) {

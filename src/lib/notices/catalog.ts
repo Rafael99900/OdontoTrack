@@ -19,7 +19,7 @@ type NoticeCatalogRow = {
   canonical_url: string;
   current_version_id: string | null;
   last_captured_at: string;
-  sources: { name: string } | null;
+  sources: { name: string }[] | null;
 };
 
 export class CatalogConfigurationError extends Error {
@@ -29,31 +29,22 @@ export class CatalogConfigurationError extends Error {
   }
 }
 
-function configuredCatalogEndpoint() {
-  const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_ANON_KEY;
-  if (!url || !key) throw new CatalogConfigurationError();
-
-  const endpoint = new URL("rest/v1/notices", url.endsWith("/") ? url : `${url}/`);
-  endpoint.searchParams.set("select", "id,title,municipality,state_code,organization_name,canonical_url,current_version_id,last_captured_at,sources(name)");
-  endpoint.searchParams.set("editorial_status", "eq.published");
-  endpoint.searchParams.set("order", "last_captured_at.desc");
-  endpoint.searchParams.set("limit", "50");
-  return { endpoint, key };
-}
-
-export async function listPublishedNotices(): Promise<NoticeCatalogItem[]> {
-  const { endpoint, key } = configuredCatalogEndpoint();
-  const response = await fetch(endpoint, {
-    headers: {
-      apikey: key,
-      Authorization: `Bearer ${key}`,
-    },
-    cache: "no-store",
-  });
-
-  if (!response.ok) throw new Error("Não foi possível consultar o catálogo oficial.");
-  const rows = (await response.json()) as NoticeCatalogRow[];
+export async function listVisibleNotices(): Promise<NoticeCatalogItem[]> {
+  let client;
+  try {
+    client = createSupabaseAdminClient();
+  } catch (error) {
+    if (error instanceof SupabaseAdminConfigurationError) throw new CatalogConfigurationError();
+    throw error;
+  }
+  const { data, error } = await client
+    .from("notices")
+    .select("id,title,municipality,state_code,organization_name,canonical_url,current_version_id,last_captured_at,sources(name)")
+    .in("editorial_status", ["approved", "published"])
+    .order("last_captured_at", { ascending: false })
+    .limit(50);
+  if (error) throw new Error("Não foi possível consultar o catálogo oficial.");
+  const rows = (data ?? []) as NoticeCatalogRow[];
   return rows.map((row) => ({
     id: row.id,
     title: row.title,
@@ -61,8 +52,9 @@ export async function listPublishedNotices(): Promise<NoticeCatalogItem[]> {
     stateCode: row.state_code,
     organizationName: row.organization_name,
     canonicalUrl: row.canonical_url,
-    sourceName: row.sources?.name ?? null,
+    sourceName: row.sources?.[0]?.name ?? null,
     currentVersionId: row.current_version_id,
     lastCapturedAt: row.last_captured_at,
   }));
 }
+import { createSupabaseAdminClient, SupabaseAdminConfigurationError } from "@/lib/supabase/admin";
