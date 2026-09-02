@@ -11,7 +11,7 @@ export const GRANDE_ABC_SOURCES = [
   {
     key: "sao-bernardo-concursos",
     name: "Prefeitura de São Bernardo do Campo: Concursos",
-    requestedUrl: "https://concurso.saobernardo.sp.gov.br/",
+    requestedUrl: "https://saobernardo.sp.gov.br/web/sbc/em-andamento",
     municipality: "São Bernardo do Campo",
     kind: "official_portal",
   },
@@ -32,7 +32,7 @@ export const GRANDE_ABC_SOURCES = [
   {
     key: "diadema-diario-oficial",
     name: "Prefeitura de Diadema: Diário Oficial",
-    requestedUrl: "https://www.diadema.sp.gov.br/diario-oficial/",
+    requestedUrl: "https://diariooficial.diadema.sp.gov.br/",
     municipality: "Diadema",
     kind: "official_gazette",
   },
