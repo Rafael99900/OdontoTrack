@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createNoticeCourseDraft } from "@/lib/courses/notice-course-draft";
 import { LessonStudio } from "@/features/learning/lesson-studio";
 import { firstRealNoticeCandidate } from "@/lib/notices/first-real-notice";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -11,7 +12,8 @@ export default async function CursosPage() {
   const client = await createSupabaseServerClient();
   const { data: { user } } = await client.auth.getUser();
   if (!user) redirect("/login");
-  const { data: persistedNotice } = await client
+  const admin = createSupabaseAdminClient();
+  const { data: persistedNotice } = await admin
     .from("notices")
     .select("editorial_status")
     .eq("external_reference", firstRealNoticeCandidate.id)
