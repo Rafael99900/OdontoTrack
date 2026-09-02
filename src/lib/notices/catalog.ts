@@ -19,7 +19,7 @@ type NoticeCatalogRow = {
   canonical_url: string;
   current_version_id: string | null;
   last_captured_at: string;
-  sources: { name: string }[] | null;
+  sources: { name: string } | null;
 };
 
 export class CatalogConfigurationError extends Error {
@@ -44,7 +44,7 @@ export async function listVisibleNotices(): Promise<NoticeCatalogItem[]> {
     .order("last_captured_at", { ascending: false })
     .limit(50);
   if (error) throw new Error("Não foi possível consultar o catálogo oficial.");
-  const rows = (data ?? []) as NoticeCatalogRow[];
+  const rows = (data ?? []) as unknown as NoticeCatalogRow[];
   return rows.map((row) => ({
     id: row.id,
     title: row.title,
@@ -52,7 +52,7 @@ export async function listVisibleNotices(): Promise<NoticeCatalogItem[]> {
     stateCode: row.state_code,
     organizationName: row.organization_name,
     canonicalUrl: row.canonical_url,
-    sourceName: row.sources?.[0]?.name ?? null,
+    sourceName: row.sources?.name ?? null,
     currentVersionId: row.current_version_id,
     lastCapturedAt: row.last_captured_at,
   }));

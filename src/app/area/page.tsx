@@ -13,6 +13,7 @@ export default async function AreaPage() {
     <h1>Olá, {user.email}.</h1>
     <p>Revise fontes oficiais antes de transformar um edital em curso e trilha de estudo.</p>
     <div className="area-actions">
+      <a className="primario" href="/area/editais" data-cy="open-approved-notices">Ver editais aprovados</a>
       <a className="primario" href="/area/revisoes" data-cy="open-editorial-review">Abrir revisão editorial</a>
       <a className="secundario" href="/area/cursos" data-cy="open-course-draft">Ver trilha em rascunho</a>
     </div>
