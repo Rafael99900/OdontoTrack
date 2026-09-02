@@ -81,4 +81,6 @@ export const firstRealNoticeCandidate = {
   ],
 } as const;
 
-export type FirstRealNoticeCandidate = typeof firstRealNoticeCandidate;
+export type FirstRealNoticeCandidate = Omit<typeof firstRealNoticeCandidate, "editorialStatus"> & {
+  editorialStatus: "pending_review" | "approved";
+};

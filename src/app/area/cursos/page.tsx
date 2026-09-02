@@ -11,7 +11,15 @@ export default async function CursosPage() {
   const client = await createSupabaseServerClient();
   const { data: { user } } = await client.auth.getUser();
   if (!user) redirect("/login");
-  const course = createNoticeCourseDraft(firstRealNoticeCandidate);
+  const { data: persistedNotice } = await client
+    .from("notices")
+    .select("editorial_status")
+    .eq("external_reference", firstRealNoticeCandidate.id)
+    .maybeSingle();
+  const course = createNoticeCourseDraft({
+    ...firstRealNoticeCandidate,
+    editorialStatus: persistedNotice?.editorial_status === "approved" ? "approved" : "pending_review",
+  });
   const lessonCount = course.modules.reduce((total, module) => total + module.lessons.length, 0);
 
   return <main className="editorial-page" data-cy="courses-editorial-page">
