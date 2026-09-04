@@ -23,6 +23,7 @@ export default async function EditaisPage() {
         <p>{notice.organizationName}</p>
         <p>Fonte: {notice.sourceName ?? "órgão oficial"} · atualização editorial em {new Date(notice.lastCapturedAt).toLocaleDateString("pt-BR")}</p>
         <a className="primario" href={notice.canonicalUrl} target="_blank" rel="noreferrer" data-cy={`open-official-notice-${notice.id}`}>Abrir fonte oficial</a>
+        {notice.municipality === "Mauá" && <a className="secundario" href="/area/editais/maua" data-cy="open-maua-analysis">Analisar edital</a>}
       </article>) : <article data-cy="approved-notices-empty"><h2>Nenhum edital aprovado ainda.</h2><p>As novas capturas aparecerão aqui depois da conferência editorial.</p></article>}
     </section>
   </main>;
