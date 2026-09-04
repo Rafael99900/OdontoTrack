@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+const migration = await readFile(new URL("../supabase/migrations/010_learning_course_runtime.sql", import.meta.url), "utf8");
+const persistence = await readFile(new URL("../src/lib/learning/maua-course-persistence.ts", import.meta.url), "utf8");
+const template = await readFile(new URL("../src/lib/learning/maua-course-template.ts", import.meta.url), "utf8");
+const progress = await readFile(new URL("../src/features/learning/course-progress.tsx", import.meta.url), "utf8");
+assert.match(migration, /learning_lesson_progress/); assert.match(migration, /learning_video_candidates/); assert.match(migration, /enable row level security/);
+assert.match(persistence, /editorial_status !== "approved"/); assert.match(persistence, /owner !== userId/);
+assert.match(template, /link_only_verified/); assert.match(template, /modules: \[/); assert.match(progress, /api\/cursos\/progresso/);
+console.log("Learning runtime contract passed.");
