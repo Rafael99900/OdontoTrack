@@ -18,11 +18,28 @@ function stableCapture(body, contentType) {
 export async function collectOfficialPage(source, { fetchPage = fetch, now = () => new Date() } = {}) {
   const startedAt = now().toISOString();
   try {
-    const response = await fetchPage(source.requestedUrl, {
-      headers: { "user-agent": "OdontoTrack/0.1 official-source-check" },
-      redirect: "follow",
-    });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const candidates = [source.requestedUrl, ...(source.fallbackUrls ?? [])];
+    let response;
+    let requestedUrl = source.requestedUrl;
+    let lastError;
+    for (const candidate of candidates) {
+      try {
+        const current = await fetchPage(candidate, {
+          headers: {
+            "user-agent": "Mozilla/5.0 (compatible; OdontoTrack/1.0; +https://odonto-track.vercel.app)",
+            accept: "text/html,application/xhtml+xml,application/pdf;q=0.9,*/*;q=0.8",
+            "accept-language": "pt-BR,pt;q=0.9",
+          },
+          redirect: "follow",
+          signal: AbortSignal.timeout(20000),
+        });
+        if (!current.ok) throw new Error(`HTTP ${current.status}`);
+        response = current;
+        requestedUrl = candidate;
+        break;
+      } catch (error) { lastError = error; }
+    }
+    if (!response) throw lastError ?? new Error("Fonte indisponível");
     const body = Buffer.from(await response.arrayBuffer());
     const contentType = response.headers.get("content-type") ?? "";
     const rawContentHash = sha256(body);
@@ -30,7 +47,7 @@ export async function collectOfficialPage(source, { fetchPage = fetch, now = () 
     const completedAt = now().toISOString();
     return {
       sourceKey: source.key,
-      requestedUrl: source.requestedUrl,
+      requestedUrl,
       canonicalUrl: response.url || source.requestedUrl,
       contentHash,
       startedAt,
