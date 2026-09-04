@@ -14,7 +14,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ sources: sources.map(({ result, saved }) => ({
       sourceKey: result.sourceKey,
       runStatus: saved.runStatus ?? result.runStatus,
-      snapshotId: saved.snapshotId ?? null,
+      snapshotId: (saved as { snapshotId?: string | null }).snapshotId ?? null,
       snapshotRecorded: saved.snapshotRecorded,
     })) });
   } catch (error) {

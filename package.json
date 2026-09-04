@@ -25,9 +25,13 @@
     "persist:first-real-maua": "node scripts/persist-first-real-maua-notice.mjs",
     "test:first-real-maua-persistence": "node scripts/test-first-real-maua-persistence.mjs",
     "test:auth-contract": "node scripts/test-auth-contract.mjs",
+    "test:production-auth-smoke": "node scripts/test-production-auth-smoke.mjs",
     "test:production-readiness": "node scripts/test-production-readiness.mjs",
     "generate:lesson-pdf": "python scripts/generate-sus-lesson-pdf.py",
-    "test:learning-content": "node scripts/test-learning-content.mjs"
+    "test:learning-content": "node scripts/test-learning-content.mjs",
+    "test:daily-collection-report": "node scripts/test-daily-collection-report.mjs",
+    "test:cron-contract": "node scripts/test-cron-contract.mjs",
+    "test:grande-abc-partial-failure": "node scripts/test-grande-abc-partial-failure.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.5",
