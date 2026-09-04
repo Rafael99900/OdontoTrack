@@ -6,7 +6,7 @@ Atualizado em 01/09/2026. Este documento descreve o que já foi verificado no c�
 
 | Fluxo | Viewports-alvo | Evidência automatizada | Resultado atual |
 |---|---|---|---|
-| Login e callback | 360 x 800, 412 x 915, 768 x 1024, 1280 x 800 | `scripts/test-interface-qa-contract.mjs` e `scripts/test-auth-contract.mjs` | Estrutura e contrato aprovados; entrega real de e-mail permanece em validação operacional. |
+| Login e callback | 360 x 800, 412 x 915, 768 x 1024, 1280 x 800 | `scripts/test-interface-qa-contract.mjs`, `scripts/test-auth-contract.mjs` e `scripts/test-production-auth-smoke.mjs` | Estrutura, ações Google/magic link e proteção de rota aprovadas; entrega real de e-mail permanece em validação operacional. |
 | Área privada | 360 x 800, 768 x 1024, 1280 x 800 | `scripts/test-interface-qa-contract.mjs` | Seletores de navegação e proteção de rota cobertos por contrato. |
 | Revisão editorial | 360 x 800, 768 x 1024, 1280 x 800 | `scripts/test-interface-qa-contract.mjs` | Cartão de edital, evidências e checklist possuem seletores estáveis; aprovação persistida é outro aceite. |
 | Curso e prévia de aula | 360 x 800, 800 x 1280, 1280 x 800 | `scripts/test-interface-qa-contract.mjs`, `scripts/test-learning-content.mjs` | Recursos de aula, PDF, áudio, prompt e IA possuem pontos de teste; publicação depende da revisão editorial. |
@@ -16,6 +16,8 @@ O viewport de 800 x 1280 representa o Galaxy Tab S6 Lite em retrato. Os tamanhos
 ## Verificação publicada
 
 Em 01/09/2026, a rota publicada de login foi inspecionada em 360 x 800, 800 x 1280 e 1280 x 800. Em todos os tamanhos, o documento manteve `scrollWidth` igual a `clientWidth`, sem rolagem horizontal, e expôs o título e os três controles esperados: e-mail, envio de link e entrada Google. Esta é uma evidência de estrutura e não substitui a navegação autenticada em dispositivo real.
+
+Em 04/09/2026, o smoke test publicado confirmou, sem enviar e-mail nem iniciar uma sessão, que `/login` expõe as opções de magic link e Google, `/api/health` responde normalmente, e `/area`, `/area/revisoes` e `/area/cursos` retornam redirecionamento para `/login` quando não há sessão.
 
 ## Controles de acessibilidade implementados
 
@@ -32,6 +34,7 @@ Em 01/09/2026, a rota publicada de login foi inspecionada em 360 x 800, 800 x 12
 ```powershell
 node scripts/test-interface-qa-contract.mjs
 node scripts/test-auth-contract.mjs
+node scripts/test-production-auth-smoke.mjs
 node scripts/test-learning-content.mjs
 npm run build
 ```
