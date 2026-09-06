@@ -11,7 +11,9 @@ export type StudyAiRequest = {
   sources?: AiSource[];
 };
 
-const model = "gemini-2.5-flash";
+// Modelo aceito para novas chaves no Gemini API. A versão 2.5 Flash foi
+// retirada para novos projetos e retornava 404 em produção.
+const model = "gemini-3.6-flash";
 
 export async function askGemini(request: StudyAiRequest) {
   const apiKey = process.env.GEMINI_API_KEY;
