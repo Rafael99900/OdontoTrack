@@ -31,3 +31,9 @@ Nenhuma das sete aulas recebe vídeo incorporado nesta revisão. Os resultados i
 Antes de qualquer link ser exibido, o editor deve registrar data e resultado de abertura, título, instituição, tema coberto e a condição de acesso. Para qualquer incorporação, precisa registrar autorização ou licença que permita expressamente a incorporação. A mera existência de um player, uma página pública ou uma conta no YouTube não muda este requisito.
 
 Os dois temas sem candidato aprovado, Dentística e Farmacologia, ficam deliberadamente sem vídeo externo. A experiência do aluno permanece completa por meio do resumo, PDF autoral com fontes, questões autorais, áudio próprio e prompt contextual. Assim, não se simula uma licença inexistente para preencher a trilha.
+
+## Registro no código
+
+`src/lib/learning/maua-course-template.ts` contém `mauaLessonVideoPolicies`, a matriz que a criação da trilha consulta. Ela cria um ativo de vídeo apenas quando houver candidato com `reviewStatus: "approved"` e `usage: "external_link_only"`. Mesmo nesse caso, o aluno recebe link para a origem, nunca um arquivo copiado nem um `iframe`.
+
+Os candidatos pendentes entram em `learning_video_candidates` com `review_status: "in_review"`, para que a decisão fique auditável sem aparecer como mídia aprovada. As políticas de `dentistica` e `farmacologia` não possuem candidato e exigem explicitamente `produce_original_video_or_obtain_authorization`.

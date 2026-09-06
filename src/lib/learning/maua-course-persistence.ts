@@ -1,7 +1,7 @@
 import "server-only";
 
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { mauaCourseTemplate, mauaSusVideoCandidate } from "@/lib/learning/maua-course-template";
+import { mauaCourseTemplate, mauaLessonVideoPolicies } from "@/lib/learning/maua-course-template";
 import { firstRealNoticeCandidate } from "@/lib/notices/first-real-notice";
 
 type CourseRow = { id: string; status: string; title: string };
@@ -47,15 +47,17 @@ export async function createMauaCourseForUser(userId: string): Promise<CourseRow
         { asset_kind: "audio", status: "planned", title: `Áudio complementar: ${lesson.title}` },
         { asset_kind: "notebook_prompt", status: "planned", title: `Prompt de estudo: ${lesson.title}` },
       ];
-      if (lesson.key === "sus") assets.push({ asset_kind: "video", status: "approved", title: mauaSusVideoCandidate.title, asset_url: mauaSusVideoCandidate.externalUrl });
+      const videoPolicy = mauaLessonVideoPolicies[lesson.key];
+      const approvedLink = videoPolicy.candidates.find((candidate) => candidate.reviewStatus === "approved");
+      if (approvedLink) assets.push({ asset_kind: "video", status: "approved", title: approvedLink.title, asset_url: approvedLink.externalUrl });
       const { error: assetError } = await admin.from("learning_assets").insert(assets.map((asset) => ({ lesson_id: savedLesson.id, ...asset, source_attribution: attribution })));
       if (assetError) throw new LearningCourseError("Não foi possível registrar os materiais da aula.");
-      if (lesson.key === "sus") {
-        const { error: videoError } = await admin.from("learning_video_candidates").insert({
-          lesson_id: savedLesson.id, provider: mauaSusVideoCandidate.provider, title: mauaSusVideoCandidate.title, external_url: mauaSusVideoCandidate.externalUrl,
-          channel_name: mauaSusVideoCandidate.channelName, rights_evidence_url: mauaSusVideoCandidate.rightsEvidenceUrl,
-          license_status: mauaSusVideoCandidate.licenseStatus, review_status: "approved",
-        });
+      if (videoPolicy.candidates.length > 0) {
+        const { error: videoError } = await admin.from("learning_video_candidates").insert(videoPolicy.candidates.map((candidate) => ({
+          lesson_id: savedLesson.id, provider: candidate.provider, title: candidate.title, external_url: candidate.externalUrl,
+          channel_name: candidate.channelName, rights_evidence_url: candidate.rightsEvidenceUrl,
+          license_status: candidate.licenseStatus, review_status: candidate.reviewStatus,
+        })));
         if (videoError) throw new LearningCourseError("Não foi possível registrar a curadoria de vídeo.");
       }
     }
