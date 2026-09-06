@@ -111,6 +111,19 @@ Limitações atuais:
 6. Promover Gemini para um painel global e contextual, com fontes visíveis, limites e histórico seguro.
 7. Rodar QA de ponta a ponta em desktop, tablet e celular após cada bloco acima.
 
+## Backlog corretivo aprovado
+
+Os seguintes pontos foram confirmados como defeitos prioritários de produto em 06/09/2026. Eles só podem ser encerrados com fluxo real, dados persistidos quando aplicável e revisão de responsividade em celular, tablet e desktop.
+
+1. Construir o dashboard de oportunidades.
+2. Substituir a análise fixa de Mauá por análise dinâmica e estimativa de horas personalizada.
+3. Completar o curso para além de uma aula parcialmente funcional.
+4. Entregar vídeo com player, estado de licença e progresso, sem uso indevido de conteúdo de terceiros.
+5. Registrar respostas, correções e revisões das questões.
+6. Tornar Gemini uma IA contextual disponível onde fizer sentido, além da aula SUS.
+7. Refazer navegação e responsividade como experiência de produto.
+8. Converter telas editoriais em jornadas completas e claras para aluno.
+
 ## Critério para considerar o produto não mockado
 
 Uma função só será considerada pronta quando tiver uma ação visível, resultado persistido ou vindo de fonte real, estado de carregamento e erro, teste de fluxo e comportamento responsivo validado. Uma página com textos fixos, botões sem efeito, dados no código ou recurso externo sem vínculo não atende esse critério.
