@@ -31,7 +31,8 @@
     "test:learning-content": "node scripts/test-learning-content.mjs",
     "test:daily-collection-report": "node scripts/test-daily-collection-report.mjs",
     "test:cron-contract": "node scripts/test-cron-contract.mjs",
-    "test:grande-abc-partial-failure": "node scripts/test-grande-abc-partial-failure.mjs"
+    "test:grande-abc-partial-failure": "node scripts/test-grande-abc-partial-failure.mjs",
+    "test:official-source-resilience": "node scripts/test-official-source-resilience.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.5",

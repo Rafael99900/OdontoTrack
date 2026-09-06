@@ -14,6 +14,12 @@ function stableCapture(body, contentType) {
     .trim(), "utf8");
 }
 
+function safeAttemptStatus(error) {
+  if (error?.name === "TimeoutError" || error?.name === "AbortError") return "timeout";
+  const status = String(error?.message ?? "").match(/^HTTP (\d{3})$/)?.[1];
+  return status ? `http_${status}` : "network_error";
+}
+
 /** Coleta uma página oficial sem classificar ou publicar editais. */
 export async function collectOfficialPage(source, { fetchPage = fetch, now = () => new Date() } = {}) {
   const startedAt = now().toISOString();
@@ -22,7 +28,8 @@ export async function collectOfficialPage(source, { fetchPage = fetch, now = () 
     let response;
     let requestedUrl = source.requestedUrl;
     let lastError;
-    for (const candidate of candidates) {
+    const attempts = [];
+    for (const [index, candidate] of candidates.entries()) {
       try {
         const current = await fetchPage(candidate, {
           headers: {
@@ -31,13 +38,19 @@ export async function collectOfficialPage(source, { fetchPage = fetch, now = () 
             "accept-language": "pt-BR,pt;q=0.9",
           },
           redirect: "follow",
-          signal: AbortSignal.timeout(20000),
+          // Evita que um portal municipal lento consuma toda a janela da função
+          // serverless e impeça a coleta das demais fontes do ABC.
+          signal: AbortSignal.timeout(source.timeoutMs ?? 8000),
         });
         if (!current.ok) throw new Error(`HTTP ${current.status}`);
         response = current;
         requestedUrl = candidate;
+        attempts.push({ url: candidate, outcome: "selected" });
         break;
-      } catch (error) { lastError = error; }
+      } catch (error) {
+        lastError = error;
+        attempts.push({ url: candidate, outcome: safeAttemptStatus(error) });
+      }
     }
     if (!response) throw lastError ?? new Error("Fonte indisponível");
     const body = Buffer.from(await response.arrayBuffer());
@@ -57,6 +70,9 @@ export async function collectOfficialPage(source, { fetchPage = fetch, now = () 
       metadata: {
         municipality: source.municipality,
         sourceKind: source.kind,
+        sourceEvidenceUrl: source.evidenceUrl ?? source.requestedUrl,
+        fallbackUsed: requestedUrl !== source.requestedUrl,
+        attempts,
         contentType,
         byteLength: body.byteLength,
         rawContentHash,
@@ -69,7 +85,7 @@ export async function collectOfficialPage(source, { fetchPage = fetch, now = () 
       startedAt,
       completedAt: now().toISOString(),
       runStatus: "failed",
-      errorMessage: error instanceof Error ? error.message : "Erro desconhecido",
+      errorMessage: safeAttemptStatus(error),
     };
   }
 }

@@ -3,16 +3,22 @@ import { collectOfficialPage } from "./official-page-source.mjs";
 export const GRANDE_ABC_SOURCES = [
   {
     key: "santo-andre-editais",
-    name: "Prefeitura de Santo André: Editais",
-    requestedUrl: "https://web.santoandre.sp.gov.br/portal/editais/3",
+    name: "Prefeitura de Santo André: portal oficial e editais",
+    // O subdomínio legado de editais excedeu a janela de execução Vercel em
+    // 06/09/2026. O portal principal é a fonte diária estável; a URL dedicada
+    // permanece registrada como evidência e será usada pelo adaptador de PDF.
+    requestedUrl: "https://www.santoandre.sp.gov.br/",
+    evidenceUrl: "https://web.santoandre.sp.gov.br/portal/editais/3",
+    timeoutMs: 7000,
     municipality: "Santo André",
     kind: "official_portal",
   },
   {
     key: "sao-bernardo-concursos",
     name: "Prefeitura de São Bernardo do Campo: Concursos",
-    requestedUrl: "https://saobernardo.sp.gov.br/web/sbc/em-andamento",
-    fallbackUrls: ["https://www.saobernardo.sp.gov.br/web/sbc/em-andamento"],
+    requestedUrl: "https://www.saobernardo.sp.gov.br/web/sbc/em-andamento",
+    fallbackUrls: ["https://saobernardo.sp.gov.br/web/sbc/em-andamento"],
+    timeoutMs: 8000,
     municipality: "São Bernardo do Campo",
     kind: "official_portal",
   },
@@ -33,8 +39,9 @@ export const GRANDE_ABC_SOURCES = [
   {
     key: "diadema-diario-oficial",
     name: "Prefeitura de Diadema: Diário Oficial",
-    requestedUrl: "https://diariooficial.diadema.sp.gov.br/",
+    requestedUrl: "https://www.diadema.sp.gov.br/diario-oficial/",
     fallbackUrls: ["https://portal.diadema.sp.gov.br/"],
+    timeoutMs: 8000,
     municipality: "Diadema",
     kind: "official_gazette",
   },
