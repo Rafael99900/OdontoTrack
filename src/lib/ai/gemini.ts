@@ -35,7 +35,11 @@ export async function askGemini(request: StudyAiRequest) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
   });
-  if (!response.ok) throw new Error("Não foi possível obter resposta da IA.");
+  if (!response.ok) {
+    const details = (await response.text()).slice(0, 500);
+    console.error("Gemini generateContent failed", { status: response.status, details });
+    throw new Error(`Não foi possível obter resposta da IA. Código ${response.status}.`);
+  }
   const data = await response.json() as { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }> };
   return data.candidates?.[0]?.content?.parts?.map((part) => part.text ?? "").join("") ?? "Não encontrei uma resposta confiável.";
 }
