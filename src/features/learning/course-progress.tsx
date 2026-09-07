@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { courseSources, lessonKeyForTitle, lessonVideoPolicy, mauaCourseContent, type CourseLessonKey } from "@/lib/learning/maua-course-content";
+import { courseSources, lessonKeyForTitle, mauaCourseContent, type CourseLessonKey } from "@/lib/learning/maua-course-content";
+import { mauaYouTubeVideos } from "@/lib/learning/youtube-curation";
+import { OfficialYouTubePlayer } from "@/features/learning/official-youtube-player";
 
 type Lesson = { id: string; title: string; objective: string; position: number };
 type Module = { id: string; title: string; position: number; learning_lessons: Lesson[] };
@@ -51,8 +53,7 @@ export function CourseProgress() {
 
   if (!course) return <section className="course-runtime" data-cy="course-runtime"><p>Crie sua trilha para liberar as aulas privadas.</p></section>;
   const percent = lessons.length ? Math.round((completed.size / lessons.length) * 100) : 0;
-  const policy = key ? lessonVideoPolicy(key) : null;
-  const approvedVideos = policy?.candidates.filter((candidate) => candidate.reviewStatus === "approved") ?? [];
+  const video = key ? mauaYouTubeVideos[key] : null;
 
   return <section className="course-runtime" data-cy="course-runtime">
     <span className="tag">MINHA TRILHA</span><h2>{course.title}</h2><p>{percent}% concluído, {completed.size} de {lessons.length} aulas.</p><progress value={completed.size} max={lessons.length || 1} aria-label="Progresso da trilha" />
@@ -63,7 +64,7 @@ export function CourseProgress() {
       {active && content && <article className="runtime-lesson-detail" data-cy="course-active-lesson">
         <span className="tag">AULA {lessons.findIndex((lesson) => lesson.id === active.id) + 1}</span><h3>{active.title}</h3><p><b>Objetivo:</b> {active.objective}</p><p>{content.summary}</p>
         <div className="lesson-tools"><a className="secundario" href={content.pdf} target="_blank" rel="noreferrer" data-cy="course-lesson-pdf">Abrir PDF editorial</a><button type="button" className="secundario" onClick={() => { const utterance = new SpeechSynthesisUtterance(content.audio); utterance.lang = "pt-BR"; window.speechSynthesis.cancel(); window.speechSynthesis.speak(utterance); }} data-cy="course-lesson-audio">Ouvir resumo</button><button className="primario" type="button" disabled={saving} onClick={() => toggle(active.id)} data-cy="course-lesson-progress">{completed.has(active.id) ? "Reabrir para revisão" : "Marcar como concluída"}</button></div>
-        <section className="lesson-video-status" data-cy="course-lesson-video"><h4>Vídeo complementar</h4>{approvedVideos.length ? approvedVideos.map((video) => <p key={video.externalUrl}><a href={video.externalUrl} target="_blank" rel="noreferrer">Abrir {video.title}</a><br /><small>Abre na fonte de origem. Não incorporamos vídeos de terceiros sem licença.</small></p>) : <p>Esta aula ainda não possui vídeo licenciado. O conteúdo segue disponível em PDF, áudio e questão. {policy?.requiredAction ? "Exige vídeo próprio ou autorização formal antes da publicação." : "A fonte candidata está em revisão editorial."}</p>}</section>
+        {video && <OfficialYouTubePlayer video={video} />}
         <section className="lesson-questions" data-cy="course-lesson-question"><h4>Questão de revisão</h4><p>{content.question.prompt}</p><div className="question-options" role="radiogroup" aria-label="Alternativas da questão de revisão">{content.question.options.map((option, index) => <button key={option} type="button" role="radio" aria-checked={selectedOption === index} className={selectedOption === index ? "selected" : ""} disabled={saving} onClick={() => answerQuestion(index)} data-cy={`course-question-option-${index + 1}`}>{String.fromCharCode(65 + index)}. {option}</button>)}</div>{feedback && <p role="status" aria-live="polite" className="question-feedback">{feedback}</p>}</section>
         <p className="lesson-disclaimer">Fontes: {courseSources.map((source) => <a key={source.url} href={source.url} target="_blank" rel="noreferrer">{source.label}</a>).reduce<ReactNode[]>((all, link, index) => index ? [...all, ", ", link] : [link], [])}.</p>
       </article>}
