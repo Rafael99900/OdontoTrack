@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createNoticeCourseDraft } from "@/lib/courses/notice-course-draft";
 import { CourseLaunch } from "@/features/learning/course-launch";
 import { CourseProgress } from "@/features/learning/course-progress";
+import { ManualCourseAuthoring } from "@/features/learning/manual-course-authoring";
 import { firstRealNoticeCandidate } from "@/lib/notices/first-real-notice";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -37,6 +38,7 @@ export default async function CursosPage() {
       <CourseLaunch canCreate={course.canPublish} />
     </section>
     <CourseProgress />
+    <ManualCourseAuthoring />
     <section className="editorial-grid" data-cy="course-production-rules"><article><span className="tag">PADRÃO DE PRODUÇÃO</span><h2>Vídeo, PDF, áudio e questões</h2><ol>{course.productionRules.map((rule) => <li key={rule}>{rule}</li>)}</ol></article></section>
   </main>;
 }
