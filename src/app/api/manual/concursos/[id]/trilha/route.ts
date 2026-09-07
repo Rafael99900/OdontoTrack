@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createManualCourse } from "@/lib/learning/manual-authoring";
+import { createManualCourse, requireManualOwner } from "@/lib/learning/manual-authoring";
 import { authenticatedUser, manualError } from "@/app/api/manual/_lib";
 type Context = { params: Promise<{ id: string }> };
-export async function POST(_: Request, { params }: Context) { const user = await authenticatedUser(); if (!user) return NextResponse.json({ error: "Autenticação obrigatória." }, { status: 401 }); try { const result = await createManualCourse(user.id, (await params).id); return NextResponse.json(result, { status: result.created ? 201 : 200 }); } catch (error) { return manualError(error); } }
+export async function POST(_: Request, { params }: Context) { const user = await authenticatedUser(); if (!user) return NextResponse.json({ error: "Autenticação obrigatória." }, { status: 401 }); try { const result = await createManualCourse(user.id, (await params).id); const { admin } = await requireManualOwner(user.id, (await params).id); const { data: course, error } = await admin.from("learning_courses").select("id,title,status,learning_modules(id,title,position,learning_lessons(id,title,objective,position,summary,notebook_prompt,audio_script,authoring_status))").eq("id", result.course.id).single(); if (error || !course) throw new Error("Não foi possível carregar as aulas geradas."); return NextResponse.json({ ...result, course }, { status: result.created ? 201 : 200 }); } catch (error) { return manualError(error); } }

@@ -22,7 +22,7 @@ function text(value: unknown, field: string, min = 1, max = 10000) {
   return normalized;
 }
 function optionalText(value: unknown, field: string, max = 10000) { return value == null || value === "" ? null : text(value, field, 1, max); }
-function isoDate(value: unknown, field: string) { if (value == null || value === "") return null; if (typeof value !== "string" || Number.isNaN(Date.parse(value))) throw new ManualAuthoringError(`${field} precisa ser uma data ISO válida.`); return new Date(value).toISOString(); }
+function isoDate(value: unknown, field: string) { if (value == null || value === "") return null; if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value) || Number.isNaN(Date.parse(`${value}T00:00:00Z`))) throw new ManualAuthoringError(`${field} precisa ser uma data ISO válida (AAAA-MM-DD).`); return value; }
 function positiveInteger(value: unknown, field: string, optional = false) { if (optional && (value == null || value === "")) return null; if (!Number.isInteger(value) || (value as number) < 0) throw new ManualAuthoringError(`${field} precisa ser um número inteiro não negativo.`); return value as number; }
 function httpsUrl(value: unknown, field: string, optional = false) { if (optional && (value == null || value === "")) return null; if (typeof value !== "string") throw new ManualAuthoringError(`${field} é obrigatório.`); try { const url = new URL(value); if (url.protocol !== "https:") throw new Error(); return url.toString(); } catch { throw new ManualAuthoringError(`${field} precisa usar HTTPS.`); } }
 
