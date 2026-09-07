@@ -26,6 +26,7 @@ export async function askGemini(request: StudyAiRequest) {
     "Você é o assistente pedagógico do OdontoTrack.",
     "Não invente datas, vagas, requisitos ou conteúdo de edital.",
     "Para perguntas factuais de concurso, responda apenas quando houver fonte e cite a fonte usada.",
+    "Escreva em português claro, com parágrafos curtos e listas simples quando necessário. Não use sintaxe Markdown.",
     `Aula atual: ${request.lessonTitle ?? "não informada"}.`,
     `Contexto do edital: ${request.noticeContext ?? "não informado"}.`,
     sourceBlock,
