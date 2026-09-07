@@ -57,4 +57,16 @@ export async function listVisibleNotices(): Promise<NoticeCatalogItem[]> {
     lastCapturedAt: row.last_captured_at,
   }));
 }
+
+/** Contexto mínimo e auditável para perguntas gerais na área autenticada. */
+export async function buildCatalogAiContext() {
+  const notices = await listVisibleNotices();
+  return {
+    lessonTitle: "Catálogo de oportunidades OdontoTrack",
+    noticeContext: notices.length
+      ? `Há ${notices.length} edital(is) aprovado(s) no catálogo. Não afirme detalhes de cargo, data, vaga ou remuneração sem direcionar o aluno ao documento oficial.`
+      : "Não há editais aprovados disponíveis no catálogo neste momento.",
+    sources: notices.slice(0, 10).map((notice) => ({ label: `${notice.title} · ${notice.municipality}`, url: notice.canonicalUrl })),
+  };
+}
 import { createSupabaseAdminClient, SupabaseAdminConfigurationError } from "@/lib/supabase/admin";

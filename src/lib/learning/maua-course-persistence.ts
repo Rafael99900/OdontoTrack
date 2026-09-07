@@ -70,7 +70,14 @@ export async function getMauaCourseForUser(userId: string) {
   const { data, error } = await admin.from("learning_courses").select("id,status,title,learning_modules(id,title,position,learning_lessons(id,title,objective,position))")
     .eq("source_notice_version_id", versionId).eq("owner_user_id", userId).maybeSingle();
   if (error) throw new LearningCourseError("Não foi possível carregar a trilha.");
-  return data;
+  if (!data) return null;
+  const lessons = data.learning_modules.flatMap((module) => module.learning_lessons);
+  if (!lessons.length) return { ...data, progress: [] };
+  const { data: progress, error: progressError } = await admin.from("learning_lesson_progress")
+    .select("lesson_id,completed_at,last_opened_at")
+    .eq("user_id", userId).in("lesson_id", lessons.map((lesson) => lesson.id));
+  if (progressError) throw new LearningCourseError("Não foi possível carregar o progresso da trilha.");
+  return { ...data, progress: progress ?? [] };
 }
 
 export async function saveLessonProgress(userId: string, lessonId: string, completed: boolean) {
@@ -81,4 +88,20 @@ export async function saveLessonProgress(userId: string, lessonId: string, compl
   if (owner !== userId) throw new LearningCourseError("Aula não pertence ao usuário atual.");
   const { error } = await admin.from("learning_lesson_progress").upsert({ lesson_id: lessonId, user_id: userId, completed_at: completed ? new Date().toISOString() : null, last_opened_at: new Date().toISOString() }, { onConflict: "lesson_id,user_id" });
   if (error) throw new LearningCourseError("Não foi possível atualizar o progresso.");
+}
+
+export async function saveQuestionAttempt(userId: string, lessonKey: string, questionKey: string, selectedOptionIndex: number, isCorrect: boolean) {
+  const { admin, versionId } = await requireApprovedNoticeVersion();
+  const { data: course, error: courseError } = await admin.from("learning_courses").select("id,learning_modules!inner(learning_lessons!inner(id,title))")
+    .eq("source_notice_version_id", versionId).eq("owner_user_id", userId).maybeSingle();
+  if (courseError || !course) throw new LearningCourseError("Crie sua trilha antes de responder às questões.");
+  const targetTitle = lessonKey === "sus" ? mauaCourseTemplate.modules[0].lessons[0].title : null;
+  const lessons = (course.learning_modules as unknown as { learning_lessons: { id: string; title: string }[] }[])
+    .flatMap((module) => module.learning_lessons);
+  const lesson = lessons.find((item) => item.title === targetTitle);
+  if (!lesson) throw new LearningCourseError("A aula desta questão não foi encontrada na sua trilha.");
+  const { error } = await admin.from("learning_question_attempts").upsert({
+    lesson_id: lesson.id, user_id: userId, question_key: questionKey, selected_option_index: selectedOptionIndex, is_correct: isCorrect, answered_at: new Date().toISOString(), updated_at: new Date().toISOString(),
+  }, { onConflict: "lesson_id,user_id,question_key" });
+  if (error) throw new LearningCourseError("Não foi possível registrar a resposta.");
 }

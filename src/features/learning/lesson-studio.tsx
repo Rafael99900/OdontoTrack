@@ -8,6 +8,25 @@ export function LessonStudio() {
   const [answer, setAnswer] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [selectedOptions, setSelectedOptions] = useState<Record<number, number>>({});
+  const [questionFeedback, setQuestionFeedback] = useState<Record<number, string>>({});
+  const [savingQuestion, setSavingQuestion] = useState<number | null>(null);
+
+  async function answerQuestion(questionIndex: number, optionIndex: number) {
+    setSelectedOptions((current) => ({ ...current, [questionIndex]: optionIndex }));
+    setSavingQuestion(questionIndex);
+    const response = await fetch("/api/cursos/questoes", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ lessonKey: "sus", questionKey: String(questionIndex + 1), selectedOptionIndex: optionIndex }),
+    });
+    const body = await response.json() as { correct?: boolean; error?: string };
+    const item = susLessonProduction.questions[questionIndex];
+    setQuestionFeedback((current) => ({
+      ...current,
+      [questionIndex]: body.error ?? (body.correct ? "Resposta correta. Progresso salvo." : `Revise: a resposta esperada é ${String.fromCharCode(65 + item.correctOptionIndex)}.`),
+    }));
+    setSavingQuestion(null);
+  }
 
   async function askAi() {
     if (!question.trim()) return;
@@ -40,7 +59,7 @@ export function LessonStudio() {
       <a className="secundario" href="/editorial-assets/sus-principios-diretrizes-estrutura.pdf" target="_blank" rel="noreferrer" data-cy="lesson-open-pdf">Abrir PDF editorial</a>
     </div>
     <p className="lesson-disclaimer">O curso externo é aberto no site de origem. O áudio usa a voz disponível no dispositivo. Ambos são complementares e não substituem as fontes listadas.</p>
-    <div className="lesson-questions" data-cy="lesson-questions"><h3>Questões autorais para revisão</h3>{susLessonProduction.questions.map((item, index) => <details key={item.prompt}><summary>{index + 1}. {item.prompt}</summary><ol type="A">{item.options.map((option) => <li key={option}>{option}</li>)}</ol><p><b>Gabarito:</b> {String.fromCharCode(65 + item.correctOptionIndex)}. {item.explanation}</p></details>)}</div>
+    <div className="lesson-questions" data-cy="lesson-questions"><h3>Questões autorais para revisão</h3><p>Escolha uma alternativa. Sua resposta é registrada na sua trilha.</p>{susLessonProduction.questions.map((item, index) => <article className="question-card" key={item.prompt}><p><b>{index + 1}. {item.prompt}</b></p><div className="question-options" role="radiogroup" aria-label={`Alternativas da questão ${index + 1}`}>{item.options.map((option, optionIndex) => <button type="button" role="radio" aria-checked={selectedOptions[index] === optionIndex} className={selectedOptions[index] === optionIndex ? "selected" : ""} onClick={() => answerQuestion(index, optionIndex)} disabled={savingQuestion === index} key={option} data-cy={`lesson-question-${index + 1}-option-${optionIndex + 1}`}><b>{String.fromCharCode(65 + optionIndex)}.</b> {option}</button>)}</div>{questionFeedback[index] && <p role="status" aria-live="polite" className="question-feedback" data-cy={`lesson-question-${index + 1}-feedback`}>{questionFeedback[index]}</p>}<details><summary>Ver explicação e fonte</summary><p>{item.explanation}</p><a href={item.sources[0].url} target="_blank" rel="noreferrer">Consultar fonte oficial</a></details></article>)}</div>
     <div className="lesson-ai" data-cy="lesson-contextual-ai"><h3>Pergunte à IA sobre esta aula</h3><p>A resposta recebe somente o contexto e as fontes revisadas desta aula.</p><label htmlFor="lesson-ai-question">Sua pergunta</label><textarea id="lesson-ai-question" value={question} onChange={(event) => setQuestion(event.target.value)} placeholder="Ex.: Como diferenciar universalidade e integralidade?" data-cy="lesson-ai-question" /><button type="button" onClick={askAi} disabled={loading} aria-busy={loading} data-cy="lesson-ai-send">{loading ? "Consultando" : "Perguntar"}</button>{answer && <p className="lesson-ai-answer" role="status" aria-live="polite" data-cy="lesson-ai-answer">{answer}</p>}</div>
   </section>;
 }
