@@ -33,6 +33,11 @@ export type ApprovedNoticeAnalysis = {
   organizationName: string;
   canonicalUrl: string;
   currentVersion: VersionRow;
+  /**
+   * Versão aprovada da qual vieram os fatos do cargo. Pode ser anterior à
+   * versão vigente quando uma retificação ainda não altera os dados do cargo.
+   */
+  factsVersion: VersionRow;
   positions: PositionRow[];
   facts: FactRow[];
   evidence: EvidenceRow[];
@@ -73,12 +78,43 @@ export async function getApprovedNoticeAnalysis(noticeId: string): Promise<Appro
     .maybeSingle();
   if (versionError || !version) return null;
 
-  const [positionsResult, factsResult, evidenceResult, historyResult] = await Promise.all([
-    client.from("positions").select("id,title,education_level,area,vacancies,remuneration_cents,workload_hours_week").eq("notice_version_id", version.id).in("editorial_status", ["approved", "published"]),
-    client.from("notice_version_facts").select("fact_key,fact_value").eq("notice_version_id", version.id).in("editorial_status", ["approved", "published"]),
-    client.from("evidence").select("id,excerpt,source_url,page_number").eq("notice_version_id", version.id).in("editorial_status", ["approved", "published"]).order("page_number", { ascending: true }),
-    client.from("notice_versions").select("id,version_number,document_url,source_url,publication_date,captured_at,change_summary,editorial_status").eq("notice_id", notice.id).in("editorial_status", ["approved", "published"]).order("version_number", { ascending: false }),
-  ]);
+  const { data: historyData } = await client
+    .from("notice_versions")
+    .select("id,version_number,document_url,source_url,publication_date,captured_at,change_summary,editorial_status")
+    .eq("notice_id", notice.id)
+    .in("editorial_status", ["approved", "published"])
+    .order("version_number", { ascending: false });
+  const history = asRows<VersionRow>(historyData);
+  if (!history.length) return null;
+
+  // Retificações oficiais podem não repetir cargo, remuneração e conteúdo.
+  // Nessa situação, preservamos a versão vigente para rastreabilidade, mas
+  // usamos a última versão aprovada que contém os dados do cargo. Não há
+  // preenchimento por suposição nem leitura de versão pendente.
+  const versionRows = [version, ...history.filter((item) => item.id !== version.id)];
+  let factsVersion = version;
+  let positions: PositionRow[] = [];
+  let facts: FactRow[] = [];
+  for (const candidate of versionRows) {
+    const [positionsResult, factsResult] = await Promise.all([
+      client.from("positions").select("id,title,education_level,area,vacancies,remuneration_cents,workload_hours_week").eq("notice_version_id", candidate.id).in("editorial_status", ["approved", "published"]),
+      client.from("notice_version_facts").select("fact_key,fact_value").eq("notice_version_id", candidate.id).in("editorial_status", ["approved", "published"]),
+    ]);
+    const candidatePositions = asRows<PositionRow>(positionsResult.data);
+    const candidateFacts = asRows<FactRow>(factsResult.data);
+    if (candidatePositions.length || candidateFacts.length) {
+      factsVersion = candidate;
+      positions = candidatePositions;
+      facts = candidateFacts;
+      break;
+    }
+  }
+  const { data: evidenceData } = await client
+    .from("evidence")
+    .select("id,excerpt,source_url,page_number")
+    .eq("notice_version_id", factsVersion.id)
+    .in("editorial_status", ["approved", "published"])
+    .order("page_number", { ascending: true });
 
   return {
     id: notice.id,
@@ -88,10 +124,11 @@ export async function getApprovedNoticeAnalysis(noticeId: string): Promise<Appro
     organizationName: notice.organization_name,
     canonicalUrl: notice.canonical_url,
     currentVersion: version as VersionRow,
-    positions: asRows<PositionRow>(positionsResult.data),
-    facts: asRows<FactRow>(factsResult.data),
-    evidence: asRows<EvidenceRow>(evidenceResult.data),
-    history: asRows<VersionRow>(historyResult.data),
+    factsVersion,
+    positions,
+    facts,
+    evidence: asRows<EvidenceRow>(evidenceData),
+    history,
   };
 }
 
