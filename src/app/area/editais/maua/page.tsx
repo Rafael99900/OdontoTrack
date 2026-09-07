@@ -80,7 +80,7 @@ export default async function AnaliseMauaPage() {
         <ul className="subject-list">
           {subjects.map((subject) => <li key={subject}>{subject}</li>)}
         </ul>
-        <p className="review-note"><strong>Aderência da trilha:</strong> {subjects.length} tópico{subjects.length === 1 ? "" : "s"} oficial{subjects.length === 1 ? "" : "is"} identificado{subjects.length === 1 ? "" : "s"}. A estimativa usa exatamente essa lista, com teoria, questões e revisão conforme a profundidade selecionada.</p>
+        <p className="review-note"><strong>Aderência da trilha:</strong> {subjects.length} {subjects.length === 1 ? "tópico oficial identificado" : "tópicos oficiais identificados"}. A estimativa usa exatamente essa lista, com teoria, questões e revisão conforme a profundidade selecionada.</p>
         <a className="primario" href="/area/cursos" data-cy="create-study-path-from-notice">Criar trilha a partir deste edital</a>
       </article>
 
