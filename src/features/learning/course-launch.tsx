@@ -8,7 +8,8 @@ export function CourseLaunch({ canCreate }: { canCreate: boolean }) {
     setLoading(true); setStatus(null);
     const response = await fetch("/api/cursos/maua-odontologia", { method: "POST" });
     const body = await response.json() as { course?: { title: string }; error?: string };
-    setStatus(body.course ? `Trilha criada: ${body.course.title}.` : body.error ?? "Não foi possível criar a trilha."); setLoading(false);
+    setStatus(body.course ? `Trilha criada: ${body.course.title}. Carregando suas aulas...` : body.error ?? "Não foi possível criar a trilha."); setLoading(false);
+    if (body.course) window.setTimeout(() => window.location.reload(), 450);
   }
   return <div className="course-launch" data-cy="course-launch">
     <button type="button" className="primario" disabled={!canCreate || loading} onClick={createCourse} data-cy="course-create-button">{loading ? "Criando trilha" : "Criar minha trilha"}</button>

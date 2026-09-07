@@ -2,6 +2,7 @@ import "server-only";
 
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { mauaCourseTemplate, mauaLessonVideoPolicies } from "@/lib/learning/maua-course-template";
+import { titleForLessonKey, type CourseLessonKey } from "@/lib/learning/maua-course-content";
 import { firstRealNoticeCandidate } from "@/lib/notices/first-real-notice";
 
 type CourseRow = { id: string; status: string; title: string };
@@ -95,7 +96,8 @@ export async function saveQuestionAttempt(userId: string, lessonKey: string, que
   const { data: course, error: courseError } = await admin.from("learning_courses").select("id,learning_modules!inner(learning_lessons!inner(id,title))")
     .eq("source_notice_version_id", versionId).eq("owner_user_id", userId).maybeSingle();
   if (courseError || !course) throw new LearningCourseError("Crie sua trilha antes de responder às questões.");
-  const targetTitle = lessonKey === "sus" ? mauaCourseTemplate.modules[0].lessons[0].title : null;
+  const targetKey = lessonKey as CourseLessonKey;
+  const targetTitle = titleForLessonKey(targetKey);
   const lessons = (course.learning_modules as unknown as { learning_lessons: { id: string; title: string }[] }[])
     .flatMap((module) => module.learning_lessons);
   const lesson = lessons.find((item) => item.title === targetTitle);

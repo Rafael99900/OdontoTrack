@@ -1,27 +1,72 @@
 "use client";
-import { useEffect, useState } from "react";
+
+import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { courseSources, lessonKeyForTitle, lessonVideoPolicy, mauaCourseContent, type CourseLessonKey } from "@/lib/learning/maua-course-content";
 
 type Lesson = { id: string; title: string; objective: string; position: number };
 type Module = { id: string; title: string; position: number; learning_lessons: Lesson[] };
-type Course = { id: string; title: string; status: string; learning_modules: Module[] };
+type Course = { id: string; title: string; status: string; learning_modules: Module[]; progress?: { lesson_id: string; completed_at: string | null }[] };
 
 export function CourseProgress() {
   const [course, setCourse] = useState<Course | null>(null);
   const [completed, setCompleted] = useState<Set<string>>(new Set());
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [selectedOption, setSelectedOption] = useState<number | null>(null);
+  const [feedback, setFeedback] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+
   useEffect(() => { fetch("/api/cursos/maua-odontologia").then(async (response) => {
-    if (!response.ok) return; const body = await response.json() as { course?: Course | null }; setCourse(body.course ?? null);
+    if (!response.ok) return;
+    const body = await response.json() as { course?: Course | null };
+    const loaded = body.course ?? null;
+    setCourse(loaded);
+    if (loaded) {
+      setCompleted(new Set((loaded.progress ?? []).filter((item) => item.completed_at).map((item) => item.lesson_id)));
+      setActiveId(loaded.learning_modules.flatMap((module) => module.learning_lessons)[0]?.id ?? null);
+    }
   }).catch(() => undefined); }, []);
+
+  const lessons = useMemo(() => course?.learning_modules.slice().sort((a, b) => a.position - b.position).flatMap((module) => module.learning_lessons.slice().sort((a, b) => a.position - b.position)) ?? [], [course]);
+  const active = lessons.find((lesson) => lesson.id === activeId) ?? lessons[0];
+  const key = active ? lessonKeyForTitle(active.title) : null;
+  const content = key ? mauaCourseContent[key] : null;
+
   async function toggle(lessonId: string) {
-    const next = new Set(completed); const done = !next.has(lessonId);
+    const done = !completed.has(lessonId); setSaving(true);
     const response = await fetch("/api/cursos/progresso", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ lessonId, completed: done }) });
-    if (!response.ok) { setMessage("Não foi possível salvar o progresso."); return; }
-    done ? next.add(lessonId) : next.delete(lessonId); setCompleted(next); setMessage(done ? "Aula marcada como concluída." : "Aula reaberta para revisão.");
+    setSaving(false);
+    if (!response.ok) { setMessage("Não foi possível salvar o progresso. Tente novamente."); return; }
+    setCompleted((current) => { const next = new Set(current); done ? next.add(lessonId) : next.delete(lessonId); return next; });
+    setMessage(done ? "Aula marcada como concluída e salva na sua conta." : "Aula reaberta para revisão.");
   }
-  if (!course) return null;
-  const lessons = course.learning_modules.flatMap((module) => module.learning_lessons);
+
+  async function answerQuestion(optionIndex: number) {
+    if (!key) return; setSelectedOption(optionIndex); setSaving(true); setFeedback(null);
+    const response = await fetch("/api/cursos/questoes", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ lessonKey: key, questionKey: "1", selectedOptionIndex: optionIndex }) });
+    const body = await response.json() as { correct?: boolean; error?: string };
+    setSaving(false);
+    setFeedback(body.error ?? (body.correct ? "Resposta correta. Sua tentativa foi salva." : `Resposta registrada. ${content?.question.explanation ?? "Revise o material antes de seguir."}`));
+  }
+
+  if (!course) return <section className="course-runtime" data-cy="course-runtime"><p>Crie sua trilha para liberar as aulas privadas.</p></section>;
   const percent = lessons.length ? Math.round((completed.size / lessons.length) * 100) : 0;
-  return <section className="course-runtime" data-cy="course-runtime"><span className="tag">MINHA TRILHA</span><h2>{course.title}</h2><p>{percent}% concluído, {completed.size} de {lessons.length} aulas.</p><progress value={completed.size} max={lessons.length} aria-label="Progresso da trilha" />
-    {course.learning_modules.sort((a, b) => a.position - b.position).map((module) => <article key={module.id}><h3>{module.title}</h3>{module.learning_lessons.sort((a, b) => a.position - b.position).map((lesson) => <div className="runtime-lesson" key={lesson.id}><div><b>{lesson.title}</b><small>{lesson.objective}</small></div><button type="button" onClick={() => toggle(lesson.id)} data-cy={`lesson-progress-${lesson.id}`}>{completed.has(lesson.id) ? "Concluída" : "Marcar concluída"}</button></div>)}</article>)}
-    {message && <p role="status" aria-live="polite" data-cy="course-progress-status">{message}</p>}</section>;
+  const policy = key ? lessonVideoPolicy(key) : null;
+  const approvedVideos = policy?.candidates.filter((candidate) => candidate.reviewStatus === "approved") ?? [];
+
+  return <section className="course-runtime" data-cy="course-runtime">
+    <span className="tag">MINHA TRILHA</span><h2>{course.title}</h2><p>{percent}% concluído, {completed.size} de {lessons.length} aulas.</p><progress value={completed.size} max={lessons.length || 1} aria-label="Progresso da trilha" />
+    <div className="course-player-layout">
+      <nav aria-label="Aulas da trilha" className="course-lesson-nav" data-cy="course-lesson-navigation">
+        {course.learning_modules.slice().sort((a, b) => a.position - b.position).map((module) => <div key={module.id}><h3>{module.title}</h3>{module.learning_lessons.slice().sort((a, b) => a.position - b.position).map((lesson) => <button key={lesson.id} type="button" className={lesson.id === active?.id ? "active" : ""} onClick={() => { setActiveId(lesson.id); setSelectedOption(null); setFeedback(null); }} data-cy={`course-open-lesson-${lesson.id}`}><span>{completed.has(lesson.id) ? "✓" : "○"}</span>{lesson.title}</button>)}</div>)}
+      </nav>
+      {active && content && <article className="runtime-lesson-detail" data-cy="course-active-lesson">
+        <span className="tag">AULA {lessons.findIndex((lesson) => lesson.id === active.id) + 1}</span><h3>{active.title}</h3><p><b>Objetivo:</b> {active.objective}</p><p>{content.summary}</p>
+        <div className="lesson-tools"><a className="secundario" href={content.pdf} target="_blank" rel="noreferrer" data-cy="course-lesson-pdf">Abrir PDF editorial</a><button type="button" className="secundario" onClick={() => { const utterance = new SpeechSynthesisUtterance(content.audio); utterance.lang = "pt-BR"; window.speechSynthesis.cancel(); window.speechSynthesis.speak(utterance); }} data-cy="course-lesson-audio">Ouvir resumo</button><button className="primario" type="button" disabled={saving} onClick={() => toggle(active.id)} data-cy="course-lesson-progress">{completed.has(active.id) ? "Reabrir para revisão" : "Marcar como concluída"}</button></div>
+        <section className="lesson-video-status" data-cy="course-lesson-video"><h4>Vídeo complementar</h4>{approvedVideos.length ? approvedVideos.map((video) => <p key={video.externalUrl}><a href={video.externalUrl} target="_blank" rel="noreferrer">Abrir {video.title}</a><br /><small>Abre na fonte de origem. Não incorporamos vídeos de terceiros sem licença.</small></p>) : <p>Esta aula ainda não possui vídeo licenciado. O conteúdo segue disponível em PDF, áudio e questão. {policy?.requiredAction ? "Exige vídeo próprio ou autorização formal antes da publicação." : "A fonte candidata está em revisão editorial."}</p>}</section>
+        <section className="lesson-questions" data-cy="course-lesson-question"><h4>Questão de revisão</h4><p>{content.question.prompt}</p><div className="question-options" role="radiogroup" aria-label="Alternativas da questão de revisão">{content.question.options.map((option, index) => <button key={option} type="button" role="radio" aria-checked={selectedOption === index} className={selectedOption === index ? "selected" : ""} disabled={saving} onClick={() => answerQuestion(index)} data-cy={`course-question-option-${index + 1}`}>{String.fromCharCode(65 + index)}. {option}</button>)}</div>{feedback && <p role="status" aria-live="polite" className="question-feedback">{feedback}</p>}</section>
+        <p className="lesson-disclaimer">Fontes: {courseSources.map((source) => <a key={source.url} href={source.url} target="_blank" rel="noreferrer">{source.label}</a>).reduce<ReactNode[]>((all, link, index) => index ? [...all, ", ", link] : [link], [])}.</p>
+      </article>}
+    </div>{message && <p role="status" aria-live="polite" data-cy="course-progress-status">{message}</p>}
+  </section>;
 }
